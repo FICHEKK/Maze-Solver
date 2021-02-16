@@ -2,8 +2,6 @@ package views;
 
 import models.Cell;
 import models.Maze;
-import search.BreadthFirstSearch;
-import search.SearchAlgorithm;
 import search.SearchNode;
 import util.MazeGenerator;
 
@@ -24,9 +22,10 @@ public class ApplicationView extends JFrame {
     private static final int MAZE_HEIGHT = 30;
     private static final int MIN_DIMENSION = 4;
     private static final int MAX_DIMENSION = 100;
+    private static final int WALL_DENSITY = 100;
 
     private final MazeView mazeView = new MazeView();
-    private final SearchAlgorithm<Cell> searchAlgorithm = new BreadthFirstSearch<>();
+    private final SearchAlgorithmPickerView searchAlgorithmPickerView = new SearchAlgorithmPickerView();
 
     private JTextField widthTextField;
     private JTextField heightTextField;
@@ -41,20 +40,33 @@ public class ApplicationView extends JFrame {
     }
 
     private void initGUI() {
-        var controlPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
-        controlPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        var controlPanel = new JPanel(new GridLayout(0, 1));
+        controlPanel.add(createMazeGenerationPanel());
+        controlPanel.add(createMazeSearchPanel());
 
-        controlPanel.add(new JLabel("Width:", JLabel.CENTER));
-        controlPanel.add(widthTextField = new JTextField());
+        add(mazeView, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+
+        generateMaze();
+    }
+
+    private JPanel createMazeGenerationPanel() {
+        var mazeGenerationPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
+        mazeGenerationPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+        mazeGenerationPanel.add(new JLabel("Width:", JLabel.CENTER));
+        mazeGenerationPanel.add(widthTextField = new JTextField());
         widthTextField.setText(String.valueOf(MAZE_WIDTH));
 
-        controlPanel.add(new JLabel("Height:", JLabel.CENTER));
-        controlPanel.add(heightTextField = new JTextField());
+        mazeGenerationPanel.add(new JLabel("Height:", JLabel.CENTER));
+        mazeGenerationPanel.add(heightTextField = new JTextField());
         heightTextField.setText(String.valueOf(MAZE_HEIGHT));
 
-        wallDensitySlider = new JSlider(0, 100, 100);
-        controlPanel.add(new JLabel("Wall density:", JLabel.CENTER));
-        controlPanel.add(wallDensitySlider);
+        var wallDensityLabel = new JLabel("Wall density (" + WALL_DENSITY + "%):", JLabel.CENTER);
+        mazeGenerationPanel.add(wallDensityLabel);
+        mazeGenerationPanel.add(wallDensitySlider = new JSlider(0, 100, WALL_DENSITY));
+
+        wallDensitySlider.addChangeListener(e -> wallDensityLabel.setText("Wall density (" + wallDensitySlider.getValue() + "%):"));
 
         var generateMazeButton = new JButton(new AbstractAction() {
             @Override
@@ -63,15 +75,40 @@ public class ApplicationView extends JFrame {
             }
         });
         generateMazeButton.setText("Generate");
-        controlPanel.add(generateMazeButton);
+        mazeGenerationPanel.add(generateMazeButton);
 
+        return mazeGenerationPanel;
+    }
+
+    private JPanel createMazeSearchPanel() {
+        var mazeSearchPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
+        mazeSearchPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+        mazeSearchPanel.add(searchAlgorithmPickerView);
+        mazeSearchPanel.add(createSearchMazeButton());
+
+        return mazeSearchPanel;
+    }
+
+    private JButton createSearchMazeButton() {
         var searchMazeButton = new JButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 var maze = mazeView.getMaze();
+
+                if (maze.getStart() == null) {
+                    JOptionPane.showMessageDialog(null, "Please define a start cell by left clicking on a cell in the maze.");
+                    return;
+                }
+
+                if (maze.getFinish() == null) {
+                    JOptionPane.showMessageDialog(null, "Please define a finish cell by right clicking on a cell in the maze.");
+                    return;
+                }
+
                 var listOfVisitations = new ArrayList<Cell>();
 
-                var solutionHead = searchAlgorithm.findSolution(
+                var solutionHead = searchAlgorithmPickerView.getSearchAlgorithm().findSolution(
                         maze::getStart,
                         listOfVisitations::add,
                         cell -> {
@@ -85,13 +122,9 @@ public class ApplicationView extends JFrame {
                 new SearchAnimationSwingWorker(listOfVisitations, solutionHead, maze).execute();
             }
         });
+
         searchMazeButton.setText("Search");
-        controlPanel.add(searchMazeButton);
-
-        add(mazeView, BorderLayout.CENTER);
-        add(controlPanel, BorderLayout.SOUTH);
-
-        generateMaze();
+        return searchMazeButton;
     }
 
     private void generateMaze() {
