@@ -24,7 +24,9 @@ public final class Cell {
     public static final int WALL = 0b0000_0000;
     public static final int PATH = 0b0000_0001;
     public static final int START = 0b0000_0010;
-    public static final int FINISH = 0b0000_0011;
+    public static final int STEP = 0b0000_0011;
+    public static final int FINISH = 0b0000_0100;
+    public static final int SOLUTION = 0b0000_0101;
 
     private static final int TYPE_MASK = 0b0000_0111;
     private static final int IS_VISITED_MASK = 0b0000_1000;
@@ -91,5 +93,18 @@ public final class Cell {
             throw new IllegalArgumentException("Y coordinate cannot be greater than " + MAX_COORDINATE + ". Was " + y + ".");
 
         bits = (bits & ~Y_COORDINATE_MASK) | (y << Y_COORDINATE_OFFSET);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return getX() == cell.getX() && getY() == cell.getY();
+    }
+
+    @Override
+    public int hashCode() {
+        return getX() * 31 + getY();
     }
 }

@@ -1,11 +1,18 @@
 package views;
 
+import models.Cell;
+import models.Maze;
+import search.BreadthFirstSearch;
+import search.SearchAlgorithm;
+import search.SearchNode;
 import util.MazeGenerator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicationView extends JFrame {
     private static final String WINDOW_TITLE = "Maze Solver";
@@ -13,12 +20,13 @@ public class ApplicationView extends JFrame {
     private static final int WINDOW_HEIGHT = 800;
     private static final int PADDING = 10;
 
-    private static final int MAZE_WIDTH = 10;
-    private static final int MAZE_HEIGHT = 10;
+    private static final int MAZE_WIDTH = 30;
+    private static final int MAZE_HEIGHT = 30;
     private static final int MIN_DIMENSION = 4;
     private static final int MAX_DIMENSION = 100;
 
-    private final MazeView maze = new MazeView();
+    private final MazeView mazeView = new MazeView();
+    private final SearchAlgorithm<Cell> searchAlgorithm = new BreadthFirstSearch<>();
 
     private JTextField widthTextField;
     private JTextField heightTextField;
@@ -54,10 +62,33 @@ public class ApplicationView extends JFrame {
                 generateMaze();
             }
         });
-        generateMazeButton.setText("Generate maze");
+        generateMazeButton.setText("Generate");
         controlPanel.add(generateMazeButton);
 
-        add(maze, BorderLayout.CENTER);
+        var searchMazeButton = new JButton(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                var maze = mazeView.getMaze();
+                var listOfVisitations = new ArrayList<Cell>();
+
+                var solutionHead = searchAlgorithm.findSolution(
+                        maze::getStart,
+                        listOfVisitations::add,
+                        cell -> {
+                            var neighbours = maze.getNeighbours(cell);
+                            neighbours.removeIf(c -> c.getType() == Cell.WALL);
+                            return neighbours;
+                        },
+                        cell -> cell.equals(maze.getFinish())
+                );
+
+                new SearchAnimationSwingWorker(listOfVisitations, solutionHead, maze).execute();
+            }
+        });
+        searchMazeButton.setText("Search");
+        controlPanel.add(searchMazeButton);
+
+        add(mazeView, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
 
         generateMaze();
@@ -76,7 +107,7 @@ public class ApplicationView extends JFrame {
 
             var wallDensity = wallDensitySlider.getValue() / 100.0;
             var mazeGenerator = new MazeGenerator(width, height, wallDensity);
-            maze.setMaze(mazeGenerator.generate());
+            mazeView.setMaze(mazeGenerator.generate());
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(ApplicationView.this, ex.getMessage());
         }
@@ -92,5 +123,48 @@ public class ApplicationView extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new ApplicationView().setVisible(true));
+    }
+
+    private static class SearchAnimationSwingWorker extends SwingWorker<Void, Void> {
+        private static final int SEARCH_STEP_DURATION = 5;
+        private static final int SOLUTION_STEP_DURATION = 5;
+
+        private final List<Cell> listOfVisitations;
+        private final SearchNode<Cell> solutionHead;
+        private final Maze maze;
+
+        public SearchAnimationSwingWorker(List<Cell> listOfVisitations, SearchNode<Cell> solutionHead, Maze maze) {
+            this.listOfVisitations = listOfVisitations;
+            this.solutionHead = solutionHead;
+            this.maze = maze;
+        }
+
+        @Override
+        protected Void doInBackground() throws InterruptedException {
+            animateSearchAlgorithm();
+
+            if (solutionHead != null) {
+                animateSolution();
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Solution could not be found.");
+            }
+
+            return null;
+        }
+
+        private void animateSearchAlgorithm() throws InterruptedException {
+            for (var visitedCell : listOfVisitations) {
+                maze.setCell(visitedCell.getX(), visitedCell.getY(), Cell.STEP);
+                Thread.sleep(SEARCH_STEP_DURATION);
+            }
+        }
+
+        private void animateSolution() throws InterruptedException {
+            for (var node = solutionHead; node != null; node = node.getParent()) {
+                maze.setCell(node.getState().getX(), node.getState().getY(), Cell.SOLUTION);
+                Thread.sleep(SOLUTION_STEP_DURATION);
+            }
+        }
     }
 }
