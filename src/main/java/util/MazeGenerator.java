@@ -44,8 +44,22 @@ public final class MazeGenerator {
             stack.push(neighbour);
         }
 
+        var start = convertRandomPathCellTo(Cell.START);
+        var finish = convertRandomPathCellTo(Cell.FINISH);
+
         removeRandomWalls();
-        return new Maze(grid, width, height);
+        return new Maze(grid, width, height, start, finish);
+    }
+
+    private Cell convertRandomPathCellTo(int cellType) {
+        int widthWithoutWalls = (width - 1) / 2;
+        int heightWithoutWalls = (height - 1) / 2;
+
+        var randomX = 2 * RANDOM.nextInt(widthWithoutWalls) + 1;
+        var randomY = 2 * RANDOM.nextInt(heightWithoutWalls) + 1;
+
+        grid[randomY][randomX].setType(cellType);
+        return grid[randomY][randomX];
     }
 
     private List<Direction> getValidDirections(int x, int y) {

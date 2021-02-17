@@ -14,10 +14,12 @@ public class Maze {
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(Cell[][] grid, int width, int height) {
+    public Maze(Cell[][] grid, int width, int height, Cell start, Cell finish) {
         this.grid = Objects.requireNonNull(grid);
         this.width = width;
         this.height = height;
+        this.start = Objects.requireNonNull(start);
+        this.finish = Objects.requireNonNull(finish);
     }
 
     public int getWidth() {
@@ -59,6 +61,10 @@ public class Maze {
             neighbours.add(grid[y][x - 1]);
 
         return neighbours;
+    }
+
+    public double getManhattanDistanceToFinish(Cell cell) {
+        return Math.abs(cell.getX() - finish.getX()) + Math.abs(cell.getY() - finish.getY());
     }
 
     public void setCell(int x, int y, int cellType) {

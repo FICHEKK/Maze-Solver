@@ -2,7 +2,7 @@ package views;
 
 import models.Cell;
 import models.Maze;
-import search.SearchNode;
+import search.*;
 import util.MazeGenerator;
 
 import javax.swing.*;
@@ -25,11 +25,17 @@ public class ApplicationView extends JFrame {
     private static final int WALL_DENSITY = 100;
 
     private final MazeView mazeView = new MazeView();
-    private final SearchAlgorithmPickerView searchAlgorithmPickerView = new SearchAlgorithmPickerView();
+    private final JComboBox<SearchAlgorithm<Cell>> searchAlgorithmPicker = new JComboBox<>();
 
     private JTextField widthTextField;
     private JTextField heightTextField;
     private JSlider wallDensitySlider;
+
+    private final List<SearchAlgorithm<Cell>> SEARCH_ALGORITHMS = List.of(
+            new DepthFirstSearch<>(),
+            new BreadthFirstSearch<>(),
+            new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getManhattanDistanceToFinish(cell))
+    );
 
     public ApplicationView() {
         setTitle(WINDOW_TITLE);
@@ -84,7 +90,11 @@ public class ApplicationView extends JFrame {
         var mazeSearchPanel = new JPanel(new GridLayout(1, 0, PADDING, 0));
         mazeSearchPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        mazeSearchPanel.add(searchAlgorithmPickerView);
+        for (var algorithm : SEARCH_ALGORITHMS) {
+            searchAlgorithmPicker.addItem(algorithm);
+        }
+
+        mazeSearchPanel.add(searchAlgorithmPicker);
         mazeSearchPanel.add(createSearchMazeButton());
 
         return mazeSearchPanel;
@@ -108,7 +118,11 @@ public class ApplicationView extends JFrame {
 
                 var listOfVisitations = new ArrayList<Cell>();
 
-                var solutionHead = searchAlgorithmPickerView.getSearchAlgorithm().findSolution(
+                @SuppressWarnings("unchecked")
+                var searchAlgorithm = ((SearchAlgorithm<Cell>) searchAlgorithmPicker.getSelectedItem());
+                assert searchAlgorithm != null;
+
+                var solutionHead = searchAlgorithm.findSolution(
                         maze::getStart,
                         listOfVisitations::add,
                         cell -> {
