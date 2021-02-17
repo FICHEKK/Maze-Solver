@@ -122,7 +122,7 @@ public class ApplicationView extends JFrame {
                 var searchAlgorithm = ((SearchAlgorithm<Cell>) searchAlgorithmPicker.getSelectedItem());
                 assert searchAlgorithm != null;
 
-                var solutionHead = searchAlgorithm.findSolution(
+                var path = searchAlgorithm.findPath(
                         maze::getStart,
                         listOfVisitations::add,
                         cell -> {
@@ -133,7 +133,7 @@ public class ApplicationView extends JFrame {
                         cell -> cell.equals(maze.getFinish())
                 );
 
-                new SearchAnimationSwingWorker(listOfVisitations, solutionHead, maze).execute();
+                new SearchAnimationSwingWorker(listOfVisitations, path, maze).execute();
             }
         });
 
@@ -177,12 +177,12 @@ public class ApplicationView extends JFrame {
         private static final int SOLUTION_STEP_DURATION = 5;
 
         private final List<Cell> listOfVisitations;
-        private final SearchNode<Cell> solutionHead;
+        private final List<Cell> path;
         private final Maze maze;
 
-        public SearchAnimationSwingWorker(List<Cell> listOfVisitations, SearchNode<Cell> solutionHead, Maze maze) {
+        public SearchAnimationSwingWorker(List<Cell> listOfVisitations, List<Cell> path, Maze maze) {
             this.listOfVisitations = listOfVisitations;
-            this.solutionHead = solutionHead;
+            this.path = path;
             this.maze = maze;
         }
 
@@ -190,7 +190,7 @@ public class ApplicationView extends JFrame {
         protected Void doInBackground() throws InterruptedException {
             animateSearchAlgorithm();
 
-            if (solutionHead != null) {
+            if (path != null) {
                 animateSolution();
             }
             else {
@@ -208,8 +208,8 @@ public class ApplicationView extends JFrame {
         }
 
         private void animateSolution() throws InterruptedException {
-            for (var node = solutionHead; node != null; node = node.getParent()) {
-                maze.setCell(node.getState().getX(), node.getState().getY(), Cell.SOLUTION);
+            for (var cell : path) {
+                maze.setCell(cell.getX(), cell.getY(), Cell.SOLUTION);
                 Thread.sleep(SOLUTION_STEP_DURATION);
             }
         }

@@ -7,5 +7,5 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public interface SearchAlgorithm<S> {
-    SearchNode<S> findSolution(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal);
+    List<S> findPath(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal);
 }

@@ -1,8 +1,6 @@
 package search;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -11,7 +9,7 @@ import java.util.function.Supplier;
 public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
 
     @Override
-    public SearchNode<S> findSolution(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal) {
+    public List<S> findPath(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal) {
         var open = createOpen();
         open.add(SearchNode.initial(initial.get()));
 
@@ -24,7 +22,7 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
             if (visited.contains(state)) continue;
             consumer.accept(state);
 
-            if (goal.test(state)) return node;
+            if (goal.test(state)) return constructPath(node);
             visited.add(state);
 
             for (var successor : successors.apply(state)) {
@@ -34,6 +32,16 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
         }
 
         return null;
+    }
+
+    private List<S> constructPath(SearchNode<S> head) {
+        var path = new LinkedList<S>();
+
+        for (var node = head; node != null; node = node.getParent()) {
+            path.addFirst(node.getState());
+        }
+
+        return path;
     }
 
     protected abstract Collection<SearchNode<S>> createOpen();
