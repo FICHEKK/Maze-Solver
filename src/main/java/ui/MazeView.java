@@ -27,8 +27,30 @@ public class MazeView extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 int x = (int) (maze.getWidth() * (e.getX() / (double) getWidth()));
                 int y = (int) (maze.getHeight() * (e.getY() / (double) getHeight()));
-                maze.setCell(x, y, SwingUtilities.isLeftMouseButton(e) ? Cell.START :
-                        SwingUtilities.isMiddleMouseButton(e) ? Cell.WALL : Cell.FINISH);
+
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    maze.setCell(x, y, e.isShiftDown() ? Cell.PATH : Cell.WALL);
+                }
+                else if (SwingUtilities.isMiddleMouseButton(e)) {
+                    maze.setCell(x, y, Cell.START);
+                }
+                else if (SwingUtilities.isRightMouseButton(e)) {
+                    maze.setCell(x, y, Cell.FINISH);
+                }
+            }
+        });
+
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = (int) (maze.getWidth() * (e.getX() / (double) getWidth()));
+                int y = (int) (maze.getHeight() * (e.getY() / (double) getHeight()));
+
+                if (x < 0 || x >= maze.getWidth() || y < 0 || y >= maze.getHeight()) return;
+
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    maze.setCell(x, y, e.isShiftDown() ? Cell.PATH : Cell.WALL);
+                }
             }
         });
 
