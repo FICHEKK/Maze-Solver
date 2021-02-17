@@ -3,6 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Maze {
     private final Cell[][] grid;
@@ -90,7 +91,21 @@ public class Maze {
         }
 
         cellBeingModified.setType(cellType);
-        listeners.forEach(listener -> listener.onCellChange(x, y));
+        listeners.forEach(MazeListener::onMazeChanged);
+    }
+
+    public void replaceAllCellsOfType(Set<Integer> cellTypes, int newCellType) {
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                var cell = grid[y][x];
+
+                if (cellTypes.contains(cell.getType())) {
+                    cell.setType(newCellType);
+                }
+            }
+        }
+
+        listeners.forEach(MazeListener::onMazeChanged);
     }
 
     public void addListener(MazeListener listener) {

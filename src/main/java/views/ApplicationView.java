@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ApplicationView extends JFrame {
     private static final String WINDOW_TITLE = "Maze Solver";
@@ -188,6 +189,7 @@ public class ApplicationView extends JFrame {
 
         @Override
         protected Void doInBackground() throws InterruptedException {
+            clearPreviousSearchIfNeeded();
             animateSearchAlgorithm();
 
             if (path != null) {
@@ -200,6 +202,10 @@ public class ApplicationView extends JFrame {
             return null;
         }
 
+        private void clearPreviousSearchIfNeeded() {
+            maze.replaceAllCellsOfType(Set.of(Cell.STEP, Cell.SOLUTION), Cell.PATH);
+        }
+
         private void animateSearchAlgorithm() throws InterruptedException {
             for (var visitedCell : listOfVisitations) {
                 maze.setCell(visitedCell.getX(), visitedCell.getY(), Cell.STEP);
@@ -208,8 +214,20 @@ public class ApplicationView extends JFrame {
         }
 
         private void animateSolution() throws InterruptedException {
+            int index = 0;
+
             for (var cell : path) {
-                maze.setCell(cell.getX(), cell.getY(), Cell.SOLUTION);
+                int cellType = Cell.SOLUTION;
+
+                if (index == 0)
+                    cellType = Cell.START;
+
+                if (index == path.size() - 1)
+                    cellType = Cell.FINISH;
+
+                maze.setCell(cell.getX(), cell.getY(), cellType);
+                index++;
+
                 Thread.sleep(SOLUTION_STEP_DURATION);
             }
         }

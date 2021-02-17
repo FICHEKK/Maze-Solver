@@ -2,14 +2,13 @@ package views;
 
 import models.Cell;
 import models.Maze;
-import models.MazeListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MazeView extends JComponent implements MazeListener {
+public class MazeView extends JComponent {
     private static final Color WALL_COLOR = new Color(5, 91, 0, 255);
     private static final Color PATH_COLOR = new Color(162, 97, 12, 255);
     private static final Color START_COLOR = Color.BLUE;
@@ -21,7 +20,7 @@ public class MazeView extends JComponent implements MazeListener {
 
     public void setMaze(Maze maze) {
         this.maze = maze;
-        this.maze.addListener(this);
+        this.maze.addListener(this::repaint);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -63,10 +62,5 @@ public class MazeView extends JComponent implements MazeListener {
 
     public Maze getMaze() {
         return maze;
-    }
-
-    @Override
-    public void onCellChange(int x, int y) {
-        repaint();
     }
 }
