@@ -61,6 +61,7 @@ public class MazeSearchPanel extends JPanel {
                             neighbours.removeIf(c -> c.getType() == Cell.WALL);
                             return neighbours;
                         },
+                        (cell1, cell2) -> 1.0,
                         cell -> cell.equals(maze.getFinish())
                 );
 

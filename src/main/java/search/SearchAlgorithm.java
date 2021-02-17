@@ -1,11 +1,14 @@
 package search;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public interface SearchAlgorithm<S> {
-    List<S> findPath(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal);
+    List<S> findPath(
+            Supplier<S> initial,
+            Consumer<S> consumer,
+            Function<S, List<S>> successors,
+            ToDoubleBiFunction<S, S> weight,
+            Predicate<S> goal
+    );
 }

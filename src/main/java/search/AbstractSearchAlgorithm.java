@@ -1,15 +1,18 @@
 package search;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
 
     @Override
-    public List<S> findPath(Supplier<S> initial, Consumer<S> consumer, Function<S, List<S>> successors, Predicate<S> goal) {
+    public List<S> findPath(
+            Supplier<S> initial,
+            Consumer<S> consumer,
+            Function<S, List<S>> successors,
+            ToDoubleBiFunction<S, S> weight,
+            Predicate<S> goal
+    ) {
         var open = createOpen();
         open.add(SearchNode.initial(initial.get()));
 
@@ -27,7 +30,9 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
 
             for (var successor : successors.apply(state)) {
                 if (visited.contains(successor)) continue;
-                insertNode(new SearchNode<>(successor, node.getCost() + 1, node), open);
+
+                var cost = node.getCost() + weight.applyAsDouble(state, successor);
+                insertNode(new SearchNode<>(successor, cost, node), open);
             }
         }
 
