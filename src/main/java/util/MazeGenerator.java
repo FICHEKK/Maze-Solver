@@ -52,14 +52,20 @@ public final class MazeGenerator {
     }
 
     private Cell convertRandomPathCellTo(int cellType) {
-        int widthWithoutWalls = (width - 1) / 2;
-        int heightWithoutWalls = (height - 1) / 2;
+        Cell cell;
 
-        var randomX = 2 * RANDOM.nextInt(widthWithoutWalls) + 1;
-        var randomY = 2 * RANDOM.nextInt(heightWithoutWalls) + 1;
+        do {
+            int widthWithoutWalls = (width - 1) / 2;
+            int heightWithoutWalls = (height - 1) / 2;
 
-        grid[randomY][randomX].setType(cellType);
-        return grid[randomY][randomX];
+            var randomX = 2 * RANDOM.nextInt(widthWithoutWalls) + 1;
+            var randomY = 2 * RANDOM.nextInt(heightWithoutWalls) + 1;
+
+            cell = grid[randomY][randomX];
+        } while(cell.getType() != Cell.PATH);
+
+        cell.setType(cellType);
+        return cell;
     }
 
     private List<Direction> getValidDirections(int x, int y) {

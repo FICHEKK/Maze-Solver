@@ -1,4 +1,4 @@
-package views;
+package ui;
 
 import models.Cell;
 import models.Maze;

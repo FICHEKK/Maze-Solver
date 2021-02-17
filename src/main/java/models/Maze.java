@@ -70,23 +70,14 @@ public class Maze {
 
     public void setCell(int x, int y, int cellType) {
         var cellBeingModified = grid[y][x];
+        if (cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
 
         if (cellType == Cell.START) {
-            if (cellBeingModified.equals(finish))
-                return;
-
-            if (start != null)
-                start.setType(Cell.PATH);
-
+            start.setType(Cell.PATH);
             start = cellBeingModified;
         }
         else if (cellType == Cell.FINISH) {
-            if (cellBeingModified.equals(start))
-                return;
-
-            if (finish != null)
-                finish.setType(Cell.PATH);
-
+            finish.setType(Cell.PATH);
             finish = cellBeingModified;
         }
 
