@@ -21,9 +21,9 @@ public class MazeGenerationPanel extends JPanel {
 
     private final MazeView mazeView;
 
-    private JTextField widthTextField;
-    private JTextField heightTextField;
-    private JSlider wallDensitySlider;
+    private final JTextField widthTextField = new JTextField(String.valueOf(DEFAULT_MAZE_WIDTH));
+    private final JTextField heightTextField = new JTextField(String.valueOf(DEFAULT_MAZE_HEIGHT));
+    private final JSlider wallDensitySlider = new JSlider(MIN_WALL_DENSITY, MAX_WALL_DENSITY, DEFAULT_WALL_DENSITY);
 
     public MazeGenerationPanel(MazeView mazeView) {
         this.mazeView = mazeView;
@@ -41,20 +41,20 @@ public class MazeGenerationPanel extends JPanel {
 
     private void addWidthField() {
         add(new JLabel("Width:", JLabel.CENTER));
-        add(widthTextField = new JTextField());
-        widthTextField.setText(String.valueOf(DEFAULT_MAZE_WIDTH));
+        add(widthTextField);
+        widthTextField.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private void addHeightField() {
         add(new JLabel("Height:", JLabel.CENTER));
-        add(heightTextField = new JTextField());
-        heightTextField.setText(String.valueOf(DEFAULT_MAZE_HEIGHT));
+        add(heightTextField);
+        heightTextField.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     private void addWallDensityField() {
         var wallDensityLabel = new JLabel("Wall density (" + DEFAULT_WALL_DENSITY + "%):", JLabel.CENTER);
         add(wallDensityLabel);
-        add(wallDensitySlider = new JSlider(MIN_WALL_DENSITY, MAX_WALL_DENSITY, DEFAULT_WALL_DENSITY));
+        add(wallDensitySlider);
         wallDensitySlider.addChangeListener(e -> wallDensityLabel.setText("Wall density (" + wallDensitySlider.getValue() + "%):"));
     }
 
