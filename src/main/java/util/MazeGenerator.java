@@ -28,11 +28,13 @@ public final class MazeGenerator {
         var stack = new Stack<Cell>();
         stack.push(grid[1][1]);
 
+        var visited = new HashSet<Cell>();
+
         while (!stack.isEmpty()) {
             var cell = stack.peek();
-            cell.setVisitedFlag();
+            visited.add(cell);
 
-            var validDirections = getValidDirections(cell.getX(), cell.getY());
+            var validDirections = getValidDirections(cell.getX(), cell.getY(), visited);
 
             if (validDirections.isEmpty()) {
                 stack.pop();
@@ -68,32 +70,32 @@ public final class MazeGenerator {
         return cell;
     }
 
-    private List<Direction> getValidDirections(int x, int y) {
+    private List<Direction> getValidDirections(int x, int y, Set<Cell> visited) {
         List<Direction> validDirections = new ArrayList<>(DIRECTION_COUNT);
 
-        if (y >= 2 && !grid[y - 2][x].isVisited())
+        if (y >= 2 && !visited.contains(grid[y - 2][x]))
             validDirections.add(Direction.NORTH);
 
-        if (x < (width - 2) && !grid[y][x + 2].isVisited())
+        if (x < (width - 2) && !visited.contains(grid[y][x + 2]))
             validDirections.add(Direction.EAST);
 
-        if (y < (height - 2) && !grid[y + 2][x].isVisited())
+        if (y < (height - 2) && !visited.contains(grid[y + 2][x]))
             validDirections.add(Direction.SOUTH);
 
-        if (x >= 2 && !grid[y][x - 2].isVisited())
+        if (x >= 2 && !visited.contains(grid[y][x - 2]))
             validDirections.add(Direction.WEST);
 
         return validDirections;
     }
 
     private Cell moveToNeighbour(Cell current, Direction direction) {
-        current.setNeighbourFlag(direction.sourceFlag);
+        var x = current.getX();
+        var y = current.getY();
 
-        var intermediate = grid[current.getY() + direction.offsetY][current.getX() + direction.offsetX];
+        var intermediate = grid[y + direction.offsetY][x + direction.offsetX];
         intermediate.setType(Cell.Type.PATH);
 
-        var neighbour = grid[current.getY() + direction.offsetY * 2][current.getX() + direction.offsetX * 2];
-        neighbour.setNeighbourFlag(direction.destinationFlag);
+        var neighbour = grid[y + direction.offsetY * 2][x + direction.offsetX * 2];
         neighbour.setType(Cell.Type.PATH);
 
         return neighbour;
@@ -115,7 +117,7 @@ public final class MazeGenerator {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                grid[y][x] = new Cell(x, y);
+                grid[y][x] = new Cell(x, y, Cell.Type.WALL);
             }
         }
 
@@ -123,21 +125,17 @@ public final class MazeGenerator {
     }
 
     private enum Direction {
-        NORTH(0, -1, Cell.NORTH_NEIGHBOUR, Cell.SOUTH_NEIGHBOUR),
-        EAST(1, 0, Cell.EAST_NEIGHBOUR, Cell.WEST_NEIGHBOUR),
-        SOUTH(0, 1, Cell.SOUTH_NEIGHBOUR, Cell.NORTH_NEIGHBOUR),
-        WEST(-1, 0, Cell.WEST_NEIGHBOUR, Cell.EAST_NEIGHBOUR);
+        NORTH(0, -1),
+        EAST(1, 0),
+        SOUTH(0, 1),
+        WEST(-1, 0);
 
         public final int offsetX;
         public final int offsetY;
-        public final int sourceFlag;
-        public final int destinationFlag;
 
-        Direction(int offsetX, int offsetY, int sourceFlag, int destinationFlag) {
+        Direction(int offsetX, int offsetY) {
             this.offsetX = offsetX;
             this.offsetY = offsetY;
-            this.sourceFlag = sourceFlag;
-            this.destinationFlag = destinationFlag;
         }
     }
 }
