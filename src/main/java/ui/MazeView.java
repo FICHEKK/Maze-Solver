@@ -9,13 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MazeView extends JComponent {
-    private static final Color WALL_COLOR = new Color(5, 91, 0, 255);
-    private static final Color PATH_COLOR = new Color(162, 97, 12, 255);
-    private static final Color START_COLOR = Color.BLUE;
-    private static final Color STEP_COLOR = new Color(0, 78, 200, 255);
-    private static final Color FINISH_COLOR = Color.RED;
-    private static final Color SOLUTION_COLOR = Color.GREEN;
-
     private Maze maze;
 
     public void setMaze(Maze maze) {
@@ -29,13 +22,13 @@ public class MazeView extends JComponent {
                 int y = (int) (maze.getHeight() * (e.getY() / (double) getHeight()));
 
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    maze.setCell(x, y, e.isShiftDown() ? Cell.PATH : Cell.WALL);
+                    maze.setCell(x, y, e.isShiftDown() ? Cell.Type.PATH : Cell.Type.WALL);
                 }
                 else if (SwingUtilities.isMiddleMouseButton(e)) {
-                    maze.setCell(x, y, Cell.START);
+                    maze.setCell(x, y, Cell.Type.START);
                 }
                 else if (SwingUtilities.isRightMouseButton(e)) {
-                    maze.setCell(x, y, Cell.FINISH);
+                    maze.setCell(x, y, Cell.Type.FINISH);
                 }
             }
         });
@@ -49,7 +42,7 @@ public class MazeView extends JComponent {
                 if (x < 0 || x >= maze.getWidth() || y < 0 || y >= maze.getHeight()) return;
 
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    maze.setCell(x, y, e.isShiftDown() ? Cell.PATH : Cell.WALL);
+                    maze.setCell(x, y, e.isShiftDown() ? Cell.Type.PATH : Cell.Type.WALL);
                 }
             }
         });
@@ -66,17 +59,7 @@ public class MazeView extends JComponent {
 
         for (int y = 0; y < maze.getHeight(); y++) {
             for (int x = 0; x < maze.getWidth(); x++) {
-                var cellType = maze.getCell(x, y).getType();
-
-                switch (cellType) {
-                    case Cell.WALL -> g.setColor(WALL_COLOR);
-                    case Cell.PATH -> g.setColor(PATH_COLOR);
-                    case Cell.START -> g.setColor(START_COLOR);
-                    case Cell.STEP -> g.setColor(STEP_COLOR);
-                    case Cell.FINISH -> g.setColor(FINISH_COLOR);
-                    case Cell.SOLUTION -> g.setColor(SOLUTION_COLOR);
-                }
-
+                g.setColor(maze.getCell(x, y).getType().getColor());
                 g.fillRect((int) (x * cellWidth), (int) (y * cellHeight), (int) Math.ceil(cellWidth), (int) Math.ceil(cellHeight));
             }
         }

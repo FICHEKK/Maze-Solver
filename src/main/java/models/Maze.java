@@ -68,16 +68,16 @@ public class Maze {
         return Math.abs(cell.getX() - finish.getX()) + Math.abs(cell.getY() - finish.getY());
     }
 
-    public void setCell(int x, int y, int cellType) {
+    public void setCell(int x, int y, Cell.Type cellType) {
         var cellBeingModified = grid[y][x];
         if (cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
 
-        if (cellType == Cell.START) {
-            start.setType(Cell.PATH);
+        if (cellType == Cell.Type.START) {
+            start.setType(Cell.Type.PATH);
             start = cellBeingModified;
         }
-        else if (cellType == Cell.FINISH) {
-            finish.setType(Cell.PATH);
+        else if (cellType == Cell.Type.FINISH) {
+            finish.setType(Cell.Type.PATH);
             finish = cellBeingModified;
         }
 
@@ -85,13 +85,13 @@ public class Maze {
         listeners.forEach(MazeListener::onMazeChanged);
     }
 
-    public void replaceAllCellsOfType(Set<Integer> cellTypes, int newCellType) {
+    public void replaceAllCellsOfType(Set<Cell.Type> replaceableTypes, Cell.Type replacementType) {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
                 var cell = grid[y][x];
 
-                if (cellTypes.contains(cell.getType())) {
-                    cell.setType(newCellType);
+                if (replaceableTypes.contains(cell.getType())) {
+                    cell.setType(replacementType);
                 }
             }
         }

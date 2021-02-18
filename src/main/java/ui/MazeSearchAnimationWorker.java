@@ -34,12 +34,12 @@ public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
     }
 
     private void clearPreviousSearchIfNeeded() {
-        maze.replaceAllCellsOfType(Set.of(Cell.STEP, Cell.SOLUTION), Cell.PATH);
+        maze.replaceAllCellsOfType(Set.of(Cell.Type.STEP, Cell.Type.SOLUTION), Cell.Type.PATH);
     }
 
     private void animateSearchSteps() throws InterruptedException {
         for (var visitedCell : visitedCells) {
-            maze.setCell(visitedCell.getX(), visitedCell.getY(), Cell.STEP);
+            maze.setCell(visitedCell.getX(), visitedCell.getY(), Cell.Type.STEP);
             Thread.sleep(SEARCH_STEP_DURATION_IN_MS);
         }
     }
@@ -48,13 +48,13 @@ public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
         int index = 0;
 
         for (var cell : path) {
-            int cellType = Cell.SOLUTION;
+            var cellType = Cell.Type.SOLUTION;
 
             if (index == 0)
-                cellType = Cell.START;
+                cellType = Cell.Type.START;
 
             if (index == path.size() - 1)
-                cellType = Cell.FINISH;
+                cellType = Cell.Type.FINISH;
 
             maze.setCell(cell.getX(), cell.getY(), cellType);
             index++;

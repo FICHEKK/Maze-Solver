@@ -58,7 +58,7 @@ public class MazeSearchPanel extends JPanel {
                         visitedCells::add,
                         cell -> {
                             var neighbours = maze.getNeighbours(cell);
-                            neighbours.removeIf(c -> c.getType() == Cell.WALL);
+                            neighbours.removeIf(c -> c.getType() == Cell.Type.WALL);
                             return neighbours;
                         },
                         (cell1, cell2) -> 1.0,
@@ -88,7 +88,7 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeView.getMaze().replaceAllCellsOfType(Set.of(Cell.STEP, Cell.SOLUTION), Cell.PATH);
+                mazeView.getMaze().replaceAllCellsOfType(Set.of(Cell.Type.STEP, Cell.Type.SOLUTION), Cell.Type.PATH);
             }
         });
 

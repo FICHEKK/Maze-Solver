@@ -44,14 +44,14 @@ public final class MazeGenerator {
             stack.push(neighbour);
         }
 
-        var start = convertRandomPathCellTo(Cell.START);
-        var finish = convertRandomPathCellTo(Cell.FINISH);
+        var start = convertRandomPathCellTo(Cell.Type.START);
+        var finish = convertRandomPathCellTo(Cell.Type.FINISH);
 
         removeRandomWalls();
         return new Maze(grid, width, height, start, finish);
     }
 
-    private Cell convertRandomPathCellTo(int cellType) {
+    private Cell convertRandomPathCellTo(Cell.Type cellType) {
         Cell cell;
 
         do {
@@ -62,7 +62,7 @@ public final class MazeGenerator {
             var randomY = 2 * RANDOM.nextInt(heightWithoutWalls) + 1;
 
             cell = grid[randomY][randomX];
-        } while(cell.getType() != Cell.PATH);
+        } while(cell.getType() != Cell.Type.PATH);
 
         cell.setType(cellType);
         return cell;
@@ -90,11 +90,11 @@ public final class MazeGenerator {
         current.setNeighbourFlag(direction.sourceFlag);
 
         var intermediate = grid[current.getY() + direction.offsetY][current.getX() + direction.offsetX];
-        intermediate.setType(Cell.PATH);
+        intermediate.setType(Cell.Type.PATH);
 
         var neighbour = grid[current.getY() + direction.offsetY * 2][current.getX() + direction.offsetX * 2];
         neighbour.setNeighbourFlag(direction.destinationFlag);
-        neighbour.setType(Cell.PATH);
+        neighbour.setType(Cell.Type.PATH);
 
         return neighbour;
     }
@@ -102,10 +102,10 @@ public final class MazeGenerator {
     private void removeRandomWalls() {
         for (var y = 1; y < height - 1; y++) {
             for (var x = 1; x < width - 1; x++) {
-                if (grid[y][x].getType() != Cell.WALL) continue;
+                if (grid[y][x].getType() != Cell.Type.WALL) continue;
                 if (RANDOM.nextDouble() < wallDensity) continue;
 
-                grid[y][x].setType(Cell.PATH);
+                grid[y][x].setType(Cell.Type.PATH);
             }
         }
     }
