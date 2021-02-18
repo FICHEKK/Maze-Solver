@@ -1,22 +1,27 @@
 package models;
 
+import models.cells.Cell;
+import models.cells.NatureCell;
+import models.cells.SearchCell;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class Maze {
-    private final Cell[][] grid;
+    private final NatureCell[][] natureCells;
+    private final SearchCell[][] searchCells;
     private final int width;
     private final int height;
 
-    private Cell start;
-    private Cell finish;
+    private SearchCell start;
+    private SearchCell finish;
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(Cell[][] grid, int width, int height, Cell start, Cell finish) {
-        this.grid = Objects.requireNonNull(grid);
+    public Maze(NatureCell[][] natureCells, SearchCell[][] searchCells, int width, int height, SearchCell start, SearchCell finish) {
+        this.natureCells = Objects.requireNonNull(natureCells);
+        this.searchCells = Objects.requireNonNull(searchCells);
         this.width = width;
         this.height = height;
         this.start = Objects.requireNonNull(start);
@@ -31,35 +36,39 @@ public class Maze {
         return height;
     }
 
-    public Cell getCell(int x, int y) {
-        return grid[y][x];
+    public NatureCell getNatureCell(int x, int y) {
+        return natureCells[y][x];
     }
 
-    public Cell getStart() {
-        return start;
+    public SearchCell getSearchCell(int x, int y) {
+        return searchCells[y][x];
     }
 
-    public Cell getFinish() {
-        return finish;
+    public NatureCell getStart() {
+        return getNatureCell(start.getX(), start.getY());
     }
 
-    public List<Cell> getNeighbours(Cell cell) {
-        var neighbours = new ArrayList<Cell>(4);
+    public NatureCell getFinish() {
+        return getNatureCell(finish.getX(), finish.getY());
+    }
+
+    public List<NatureCell> getNeighbours(NatureCell cell) {
+        var neighbours = new ArrayList<NatureCell>(4);
 
         var x = cell.getX();
         var y = cell.getY();
 
         if (y >= 1)
-            neighbours.add(grid[y - 1][x]);
+            neighbours.add(natureCells[y - 1][x]);
 
         if (x <= width - 2)
-            neighbours.add(grid[y][x + 1]);
+            neighbours.add(natureCells[y][x + 1]);
 
         if (y <= height - 2)
-            neighbours.add(grid[y + 1][x]);
+            neighbours.add(natureCells[y + 1][x]);
 
         if (x >= 1)
-            neighbours.add(grid[y][x - 1]);
+            neighbours.add(natureCells[y][x - 1]);
 
         return neighbours;
     }
@@ -68,33 +77,37 @@ public class Maze {
         return Math.abs(cell.getX() - finish.getX()) + Math.abs(cell.getY() - finish.getY());
     }
 
-    public void setCell(int x, int y, Cell.Type cellType) {
-        var cellBeingModified = grid[y][x];
-        if (cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
-
-        if (cellType == Cell.Type.START) {
-            start.setType(Cell.Type.PATH);
-            start = cellBeingModified;
-        }
-        else if (cellType == Cell.Type.FINISH) {
-            finish.setType(Cell.Type.PATH);
-            finish = cellBeingModified;
-        }
-
-        cellBeingModified.setType(cellType);
+    public void setNatureCell(int x, int y, NatureCell.Type type) {
+        natureCells[y][x].setType(type);
         listeners.forEach(MazeListener::onMazeChanged);
     }
 
-    public void replaceAllCellsOfType(Set<Cell.Type> replaceableTypes, Cell.Type replacementType) {
+    public void setSearchCell(int x, int y, SearchCell.Type type) {
+        var cellBeingModified = searchCells[y][x];
+        if (cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
+
+        if (type == SearchCell.Type.START) {
+            start.setType(SearchCell.Type.UNUSED);
+            start = cellBeingModified;
+        }
+        else if (type == SearchCell.Type.FINISH) {
+            finish.setType(SearchCell.Type.UNUSED);
+            finish = cellBeingModified;
+        }
+
+        cellBeingModified.setType(type);
+        listeners.forEach(MazeListener::onMazeChanged);
+    }
+
+    public void clearSearchLayer() {
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                var cell = grid[y][x];
-
-                if (replaceableTypes.contains(cell.getType())) {
-                    cell.setType(replacementType);
-                }
+                searchCells[y][x].setType(SearchCell.Type.UNUSED);
             }
         }
+
+        start.setType(SearchCell.Type.START);
+        finish.setType(SearchCell.Type.FINISH);
 
         listeners.forEach(MazeListener::onMazeChanged);
     }

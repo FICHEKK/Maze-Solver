@@ -1,6 +1,6 @@
 package ui;
 
-import models.Cell;
+import models.cells.NatureCell;
 import search.BreadthFirstSearch;
 import search.DepthFirstSearch;
 import search.GreedyBestFirstSearch;
@@ -10,14 +10,14 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class MazeSearchPanel extends JPanel {
     private static final int PADDING = 10;
 
     private final MazeView mazeView;
-    private final JComboBox<SearchAlgorithm<Cell>> searchAlgorithmPicker = new JComboBox<>();
+    private final JComboBox<SearchAlgorithm<NatureCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton clearButton = new JButton();
 
     public MazeSearchPanel(MazeView mazeView) {
@@ -26,9 +26,27 @@ public class MazeSearchPanel extends JPanel {
         setLayout(new GridLayout(1, 0, PADDING, 0));
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
+        addPaintBrushPicker();
         addSearchAlgorithmPicker();
         addSearchButton();
         addClearButton();
+    }
+
+    private void addPaintBrushPicker() {
+        var paintBrushPicker = new JComboBox<NatureCell.Type>();
+        ((JLabel) paintBrushPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+
+        for (var type : NatureCell.Type.values()) {
+            paintBrushPicker.addItem(type);
+        }
+
+        paintBrushPicker.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                mazeView.setPaintBrush((NatureCell.Type) paintBrushPicker.getSelectedItem());
+            }
+        });
+
+        add(paintBrushPicker);
     }
 
     private void addSearchAlgorithmPicker() {
@@ -47,25 +65,25 @@ public class MazeSearchPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 @SuppressWarnings("unchecked")
-                var searchAlgorithm = ((SearchAlgorithm<Cell>) searchAlgorithmPicker.getSelectedItem());
+                var searchAlgorithm = ((SearchAlgorithm<NatureCell>) searchAlgorithmPicker.getSelectedItem());
                 assert searchAlgorithm != null;
 
                 var maze = mazeView.getMaze();
-                var visitedCells = new ArrayList<Cell>();
+                var visited = new ArrayList<NatureCell>();
 
                 var path = searchAlgorithm.findPath(
                         maze::getStart,
-                        visitedCells::add,
+                        visited::add,
                         cell -> {
                             var neighbours = maze.getNeighbours(cell);
-                            neighbours.removeIf(c -> c.getType() == Cell.Type.WALL);
+                            neighbours.removeIf(c -> c.getType() == NatureCell.Type.WALL);
                             return neighbours;
                         },
                         (cell1, cell2) -> (cell1.getType().getWeight() + cell2.getType().getWeight()) / 2,
                         cell -> cell.equals(maze.getFinish())
                 );
 
-                var animationWorker = new MazeSearchAnimationWorker(maze, visitedCells, path);
+                var animationWorker = new MazeSearchAnimationWorker(maze, visited, path);
 
                 animationWorker.addPropertyChangeListener(event -> {
                     if (animationWorker.isDone()) {
@@ -88,7 +106,7 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeView.getMaze().replaceAllCellsOfType(Set.of(Cell.Type.STEP, Cell.Type.SOLUTION), Cell.Type.PATH);
+                mazeView.getMaze().clearSearchLayer();
             }
         });
 
