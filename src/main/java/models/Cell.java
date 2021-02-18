@@ -5,8 +5,6 @@ import java.awt.*;
 /**
  * Cell format (from most to least significant bit): <br>
  * <br>
- * Bits 0 to 12: X coordinate of the cell. <br>
- * Bits 12 to 24: Y coordinate of the cell. <br>
  * Bit 24: North neighbour flag. <br>
  * Bit 25: East neighbour flag. <br>
  * Bit 26: South neighbour flag. <br>
@@ -14,7 +12,7 @@ import java.awt.*;
  * Bit 28: Is visited flag. <br>
  * <br>
  * 0000 0000 0000 | 0000 0000 0000 | 0 | 0 | 0 | 0 | 0 | 000 <br>
- * X              | Y              | N | E | S | W | V | unused <br>
+ * unused         | unused         | N | E | S | W | V | unused <br>
  */
 public final class Cell {
     public static final int NORTH_NEIGHBOUR = 0b1000_0000;
@@ -24,16 +22,23 @@ public final class Cell {
 
     private static final int IS_VISITED_MASK = 0b0000_1000;
 
-    private static final int X_COORDINATE_MASK = 0xFF_F0_00_00;
-    private static final int X_COORDINATE_OFFSET = 20;
-
-    private static final int Y_COORDINATE_MASK = 0x00_0F_FF_00;
-    private static final int Y_COORDINATE_OFFSET = 8;
-
-    private static final int MAX_COORDINATE = 0x0F_FF;
-
-    private int bits;
+    private final int x;
+    private final int y;
     private Type type = Type.WALL;
+    private int bits;
+
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 
     public Type getType() {
         return type;
@@ -67,39 +72,17 @@ public final class Cell {
         bits &= ~neighbour;
     }
 
-    public int getX() {
-        return (bits & X_COORDINATE_MASK) >> X_COORDINATE_OFFSET;
-    }
-
-    public int getY() {
-        return (bits & Y_COORDINATE_MASK) >> Y_COORDINATE_OFFSET;
-    }
-
-    public void setX(int x) {
-        if (x > MAX_COORDINATE)
-            throw new IllegalArgumentException("X coordinate cannot be greater than " + MAX_COORDINATE + ". Was " + x + ".");
-
-        bits = (bits & ~X_COORDINATE_MASK) | (x << X_COORDINATE_OFFSET);
-    }
-
-    public void setY(int y) {
-        if (y > MAX_COORDINATE)
-            throw new IllegalArgumentException("Y coordinate cannot be greater than " + MAX_COORDINATE + ". Was " + y + ".");
-
-        bits = (bits & ~Y_COORDINATE_MASK) | (y << Y_COORDINATE_OFFSET);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cell cell = (Cell) o;
-        return getX() == cell.getX() && getY() == cell.getY();
+        return x == cell.x && y == cell.y;
     }
 
     @Override
     public int hashCode() {
-        return getX() * 31 + getY();
+        return x * 31 + y;
     }
 
     public enum Type {
