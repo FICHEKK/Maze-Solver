@@ -16,23 +16,21 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
         var open = createOpen();
         open.add(SearchNode.initial(initial.get()));
 
-        var visited = new HashSet<S>();
+        var visited = new HashMap<S, SearchNode<S>>();
 
         while (!open.isEmpty()) {
             var node = removeNode(open);
             var state = node.getState();
 
-            if (visited.contains(state)) continue;
+            if (visited.containsKey(state)) continue;
             consumer.accept(state);
 
             if (goal.test(state)) return constructPath(node);
-            visited.add(state);
+            visited.put(state, node);
 
             for (var successor : successors.apply(state)) {
-                if (visited.contains(successor)) continue;
-
                 var cost = node.getCost() + weight.applyAsDouble(state, successor);
-                insertNode(new SearchNode<>(successor, cost, node), open);
+                insertNode(new SearchNode<>(successor, cost, node), open, visited);
             }
         }
 
@@ -51,5 +49,5 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
 
     protected abstract Collection<SearchNode<S>> createOpen();
     protected abstract SearchNode<S> removeNode(Collection<SearchNode<S>> open);
-    protected abstract void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open);
+    protected abstract void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open, Map<S, SearchNode<S>> visited);
 }

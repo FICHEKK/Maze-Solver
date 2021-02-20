@@ -2,10 +2,7 @@ package ui;
 
 import models.Maze;
 import models.cells.NatureCell;
-import search.BreadthFirstSearch;
-import search.DepthFirstSearch;
-import search.GreedyBestFirstSearch;
-import search.SearchAlgorithm;
+import search.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -66,6 +63,8 @@ public class MazeSearchPanel extends JPanel {
         searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
         searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
         searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new Dijkstra<>());
+        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeView.getMaze().getEuclideanDistanceToFinish(cell)));
 
         ((JLabel) searchAlgorithmPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         add(searchAlgorithmPicker);
@@ -120,6 +119,7 @@ public class MazeSearchPanel extends JPanel {
     private List<NatureCell> searchMaze(Maze maze, List<NatureCell> visited) {
         Supplier<NatureCell> initial = maze::getStart;
         Consumer<NatureCell> consumer = visited::add;
+        Predicate<NatureCell> goal = cell -> cell.equals(maze.getFinish());
 
         Function<NatureCell, List<NatureCell>> successors = cell -> {
             var neighbours = maze.getNeighbours(cell);
@@ -127,8 +127,12 @@ public class MazeSearchPanel extends JPanel {
             return neighbours;
         };
 
-        ToDoubleBiFunction<NatureCell, NatureCell> weight = (cell1, cell2) -> (cell1.getType().getWeight() + cell2.getType().getWeight()) / 2;
-        Predicate<NatureCell> goal = cell -> cell.equals(maze.getFinish());
+        ToDoubleBiFunction<NatureCell, NatureCell> weight = (cell1, cell2) -> {
+            var dx = cell1.getX() - cell2.getX();
+            var dy = cell1.getY() - cell2.getY();
+            var distance = Math.sqrt(dx * dx + dy * dy);
+            return (cell1.getType().getWeight() + cell2.getType().getWeight()) * (distance / 2);
+        };
 
         return getSelectedSearchAlgorithm().findPath(initial, consumer, successors, weight, goal);
     }

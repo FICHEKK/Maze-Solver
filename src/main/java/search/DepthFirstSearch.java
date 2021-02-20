@@ -1,6 +1,7 @@
 package search;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Stack;
 
 public class DepthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
@@ -12,18 +13,17 @@ public class DepthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     protected SearchNode<S> removeNode(Collection<SearchNode<S>> open) {
-        var stack = (Stack<SearchNode<S>>) open;
-        return stack.pop();
+        return ((Stack<SearchNode<S>>) open).pop();
     }
 
     @Override
-    protected void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open) {
-        var stack = (Stack<SearchNode<S>>) open;
-        stack.push(node);
+    protected void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open, Map<S, SearchNode<S>> visited) {
+        if (visited.containsKey(node.getState())) return;
+        ((Stack<SearchNode<S>>) open).push(node);
     }
 
     @Override
     public String toString() {
-        return "Depth-first search";
+        return "Depth-first search (DFS)";
     }
 }

@@ -6,16 +6,19 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.function.ToDoubleFunction;
 
-public class GreedyBestFirstSearch<S> extends AbstractSearchAlgorithm<S> {
+public class AStar<S> extends AbstractSearchAlgorithm<S> {
     private final ToDoubleFunction<S> heuristicFunction;
 
-    public GreedyBestFirstSearch(ToDoubleFunction<S> heuristicFunction) {
+    public AStar(ToDoubleFunction<S> heuristicFunction) {
         this.heuristicFunction = heuristicFunction;
     }
 
     @Override
     protected Collection<SearchNode<S>> createOpen() {
-        return new PriorityQueue<>(Comparator.comparingDouble(node -> heuristicFunction.applyAsDouble(node.getState())));
+        return new PriorityQueue<>(
+                Comparator.<SearchNode<S>>comparingDouble(node -> node.getCost() + heuristicFunction.applyAsDouble(node.getState()))
+                        .thenComparingDouble(node -> heuristicFunction.applyAsDouble(node.getState()))
+        );
     }
 
     @Override
@@ -25,12 +28,18 @@ public class GreedyBestFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     protected void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open, Map<S, SearchNode<S>> visited) {
-        if (visited.containsKey(node.getState())) return;
-        open.add(node);
+        var visitedNode = visited.get(node.getState());
+
+        if (visitedNode == null) {
+            open.add(node);
+        }
+        else if (node.getCost() < visitedNode.getCost()) {
+            visited.put(node.getState(), node);
+        }
     }
 
     @Override
     public String toString() {
-        return "Greedy best-first search";
+        return "A* search algorithm";
     }
 }

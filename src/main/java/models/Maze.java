@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class Maze {
+    private static final int[] STRAIGHT_OFFSET_X = new int[] {0, 1, 0, -1, 0};
+    private static final int[] STRAIGHT_OFFSET_Y = new int[] {1, 0, -1, 0, 1};
+    private static final int[] DIAGONAL_OFFSET_X = new int[] {1, 1, -1, -1};
+    private static final int[] DIAGONAL_OFFSET_Y = new int[] {1, -1, -1, 1};
+
     private final NatureCell[][] natureCells;
     private final SearchCell[][] searchCells;
     private final int width;
@@ -53,28 +58,47 @@ public class Maze {
     }
 
     public List<NatureCell> getNeighbours(NatureCell cell) {
-        var neighbours = new ArrayList<NatureCell>(4);
+        final var neighbours = new ArrayList<NatureCell>();
 
-        var x = cell.getX();
-        var y = cell.getY();
+        for (var i = 0; i < 4; i++) {
+            var neighbour = getNeighbour(cell, STRAIGHT_OFFSET_X[i], STRAIGHT_OFFSET_Y[i]);
+            if (neighbour == null) continue;
+            neighbours.add(neighbour);
+        }
 
-        if (y >= 1)
-            neighbours.add(natureCells[y - 1][x]);
+        for (var i = 0; i < 4; i++) {
+            var neighbour = getNeighbour(cell, DIAGONAL_OFFSET_X[i], DIAGONAL_OFFSET_Y[i]);
+            if (neighbour == null) continue;
 
-        if (x <= width - 2)
-            neighbours.add(natureCells[y][x + 1]);
+            var adjacentCell1 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
+            if (adjacentCell1.getType() == NatureCell.Type.WALL) continue;
 
-        if (y <= height - 2)
-            neighbours.add(natureCells[y + 1][x]);
+            var adjacentCell2 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i + 1]][cell.getX() + STRAIGHT_OFFSET_X[i + 1]];
+            if (adjacentCell2.getType() == NatureCell.Type.WALL) continue;
 
-        if (x >= 1)
-            neighbours.add(natureCells[y][x - 1]);
+            neighbours.add(neighbour);
+        }
 
         return neighbours;
     }
 
+    private NatureCell getNeighbour(NatureCell anchor, int offsetX, int offsetY) {
+        var x = anchor.getX() + offsetX;
+        var y = anchor.getY() + offsetY;
+        if (x < 0 || x >= width || y < 0 || y >= height) return null;
+
+        var neighbour = natureCells[y][x];
+        return neighbour.getType() != NatureCell.Type.WALL ? neighbour : null;
+    }
+
     public double getManhattanDistanceToFinish(Cell cell) {
         return Math.abs(cell.getX() - finish.getX()) + Math.abs(cell.getY() - finish.getY());
+    }
+
+    public double getEuclideanDistanceToFinish(Cell cell) {
+        var dx = cell.getX() - finish.getX();
+        var dy = cell.getY() - finish.getY();
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public void setNatureCell(int x, int y, NatureCell.Type type) {

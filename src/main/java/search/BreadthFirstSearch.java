@@ -2,6 +2,7 @@ package search;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 public class BreadthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
@@ -13,18 +14,17 @@ public class BreadthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     protected SearchNode<S> removeNode(Collection<SearchNode<S>> open) {
-        var queue = (Queue<SearchNode<S>>) open;
-        return queue.remove();
+        return ((Queue<SearchNode<S>>) open).remove();
     }
 
     @Override
-    protected void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open) {
-        var queue = (Queue<SearchNode<S>>) open;
-        queue.add(node);
+    protected void insertNode(SearchNode<S> node, Collection<SearchNode<S>> open, Map<S, SearchNode<S>> visited) {
+        if (visited.containsKey(node.getState())) return;
+        open.add(node);
     }
 
     @Override
     public String toString() {
-        return "Breadth-first search";
+        return "Breadth-first search (BFS)";
     }
 }
