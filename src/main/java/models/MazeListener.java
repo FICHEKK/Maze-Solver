@@ -1,6 +1,6 @@
 package models;
 
-@FunctionalInterface
 public interface MazeListener {
-    void onMazeChanged();
+    void onSingleCellChanged(int x, int y);
+    void onMultipleCellsChanged();
 }

@@ -78,25 +78,30 @@ public class Maze {
     }
 
     public void setNatureCell(int x, int y, NatureCell.Type type) {
-        natureCells[y][x].setType(type);
-        listeners.forEach(MazeListener::onMazeChanged);
+        var cellBeingModified = natureCells[y][x];
+        if (cellBeingModified.getType() == type) return;
+
+        cellBeingModified.setType(type);
+        listeners.forEach(listener -> listener.onSingleCellChanged(x, y));
     }
 
     public void setSearchCell(int x, int y, SearchCell.Type type) {
         var cellBeingModified = searchCells[y][x];
-        if (cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
+        if (cellBeingModified.getType() == type || cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
 
         if (type == SearchCell.Type.START) {
             start.setType(SearchCell.Type.UNUSED);
+            listeners.forEach(listener -> listener.onSingleCellChanged(start.getX(), start.getY()));
             start = cellBeingModified;
         }
         else if (type == SearchCell.Type.FINISH) {
             finish.setType(SearchCell.Type.UNUSED);
+            listeners.forEach(listener -> listener.onSingleCellChanged(finish.getX(), finish.getY()));
             finish = cellBeingModified;
         }
 
         cellBeingModified.setType(type);
-        listeners.forEach(MazeListener::onMazeChanged);
+        listeners.forEach(listener -> listener.onSingleCellChanged(cellBeingModified.getX(), cellBeingModified.getY()));
     }
 
     public void clearSearchLayer() {
@@ -109,7 +114,7 @@ public class Maze {
         start.setType(SearchCell.Type.START);
         finish.setType(SearchCell.Type.FINISH);
 
-        listeners.forEach(MazeListener::onMazeChanged);
+        listeners.forEach(MazeListener::onMultipleCellsChanged);
     }
 
     public void addListener(MazeListener listener) {

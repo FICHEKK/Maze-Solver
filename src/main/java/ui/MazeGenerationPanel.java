@@ -10,10 +10,10 @@ import java.awt.event.ActionEvent;
 public class MazeGenerationPanel extends JPanel {
     private static final int PADDING = 10;
 
-    private static final int DEFAULT_MAZE_WIDTH = 30;
+    private static final int DEFAULT_MAZE_WIDTH = 60;
     private static final int DEFAULT_MAZE_HEIGHT = 30;
     private static final int MIN_DIMENSION = 4;
-    private static final int MAX_DIMENSION = 100;
+    private static final int MAX_DIMENSION = 1000;
 
     private static final int MIN_WALL_DENSITY = 0;
     private static final int DEFAULT_WALL_DENSITY = 100;

@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class ApplicationView extends JFrame {
     private static final String WINDOW_TITLE = "Maze Solver";
-    private static final int WINDOW_WIDTH = 800;
+    private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
 
     private final MazeView mazeView = new MazeView();

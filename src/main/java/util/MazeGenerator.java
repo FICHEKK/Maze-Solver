@@ -44,6 +44,7 @@ public final class MazeGenerator {
         while (!stack.isEmpty()) {
             var cell = stack.peek();
             visited.add(cell);
+            cell.setType(NatureCell.Type.DIRT);
 
             var validDirections = getValidDirections(cell.getX(), cell.getY(), visited);
 
@@ -53,7 +54,11 @@ public final class MazeGenerator {
             }
 
             var direction = validDirections.get(RANDOM.nextInt(validDirections.size()));
-            var neighbour = moveToNeighbour(cell, direction);
+
+            var intermediate = natureCells[cell.getY() + direction.offsetY][cell.getX() + direction.offsetX];
+            intermediate.setType(NatureCell.Type.DIRT);
+
+            var neighbour = natureCells[cell.getY() + direction.offsetY * 2][cell.getX() + direction.offsetX * 2];
             stack.push(neighbour);
         }
 
@@ -97,19 +102,6 @@ public final class MazeGenerator {
             validDirections.add(Direction.WEST);
 
         return validDirections;
-    }
-
-    private NatureCell moveToNeighbour(NatureCell current, Direction direction) {
-        var x = current.getX();
-        var y = current.getY();
-
-        var intermediate = natureCells[y + direction.offsetY][x + direction.offsetX];
-        intermediate.setType(NatureCell.Type.DIRT);
-
-        var neighbour = natureCells[y + direction.offsetY * 2][x + direction.offsetX * 2];
-        neighbour.setType(NatureCell.Type.DIRT);
-
-        return neighbour;
     }
 
     private void removeRandomWalls() {
