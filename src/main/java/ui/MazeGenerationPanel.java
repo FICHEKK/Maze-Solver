@@ -35,6 +35,7 @@ public class MazeGenerationPanel extends JPanel {
         addHeightField();
         addWallDensityField();
         addGenerateMazeButton();
+        add(new MazeSaveAndLoadPanel(mazeView));
 
         generateMaze();
     }
