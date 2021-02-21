@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ApplicationView extends JFrame {
+    private static final String WANTED_LOOK_AND_FEEL = "Nimbus";
     private static final String WINDOW_TITLE = "Maze Solver";
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
@@ -15,6 +16,7 @@ public class ApplicationView extends JFrame {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setVisible(true);
         initGUI();
     }
 
@@ -28,6 +30,20 @@ public class ApplicationView extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ApplicationView().setVisible(true));
+        setWantedLookAndFeelIfPossible();
+        SwingUtilities.invokeLater(ApplicationView::new);
+    }
+
+    private static void setWantedLookAndFeelIfPossible() {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if (info.getName().equals(WANTED_LOOK_AND_FEEL)) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
+            // ignore
+        }
     }
 }
