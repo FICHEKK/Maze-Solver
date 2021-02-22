@@ -6,7 +6,7 @@ import java.util.function.*;
 public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
 
     @Override
-    public List<S> findPath(
+    public SearchResult<S> search(
             Supplier<S> initial,
             Consumer<S> consumer,
             Function<S, List<S>> successors,
@@ -16,17 +16,18 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
         var open = createOpen();
         open.add(SearchNode.initial(initial.get()));
 
-        var visited = new HashMap<S, SearchNode<S>>();
+        var visited = new LinkedHashMap<S, SearchNode<S>>();
 
         while (!open.isEmpty()) {
             var node = removeNode(open);
             var state = node.getState();
 
             if (visited.containsKey(state)) continue;
-            consumer.accept(state);
 
-            if (goal.test(state)) return constructPath(node);
+            consumer.accept(state);
             visited.put(state, node);
+
+            if (goal.test(state)) return new SearchResult<>(node, visited);
 
             for (var successor : successors.apply(state)) {
                 var cost = node.getCost() + weight.applyAsDouble(state, successor);
@@ -34,17 +35,7 @@ public abstract class AbstractSearchAlgorithm<S> implements SearchAlgorithm<S> {
             }
         }
 
-        return null;
-    }
-
-    private List<S> constructPath(SearchNode<S> head) {
-        var path = new LinkedList<S>();
-
-        for (var node = head; node != null; node = node.getParent()) {
-            path.addFirst(node.getState());
-        }
-
-        return path;
+        return new SearchResult<>(null, visited);
     }
 
     protected abstract Collection<SearchNode<S>> createOpen();

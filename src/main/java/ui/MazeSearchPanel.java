@@ -9,7 +9,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.*;
 
@@ -22,11 +21,13 @@ public class MazeSearchPanel extends JPanel {
     private static final Color SEARCH_BUTTON_STOP_COLOR = new Color(159, 0, 0, 255);
     private static final String CLEAR_BUTTON_TEXT = "Clear";
     private static final Color CLEAR_BUTTON_BACKGROUND_COLOR = Color.WHITE;
+    private static final String SEARCH_RESULT_LABEL_TEXT = "";
 
     private final MazeView mazeView;
     private final JComboBox<SearchAlgorithm<NatureCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton searchButton = new JButton();
     private final JButton clearButton = new JButton();
+    private final JLabel searchResultLabel = new JLabel();
 
     private MazeSearchAnimationWorker animationWorker;
 
@@ -40,6 +41,7 @@ public class MazeSearchPanel extends JPanel {
         addSearchAlgorithmPicker();
         addSearchButton();
         addClearButton();
+        addSearchResultLabel();
     }
 
     private void addPaintBrushPicker() {
@@ -104,21 +106,21 @@ public class MazeSearchPanel extends JPanel {
 
     private void startAnimationWorker() {
         var maze = mazeView.getMaze();
-        var visited = new ArrayList<NatureCell>();
-        var path = searchMaze(maze, visited);
+        var searchResult = searchMaze(maze);
 
-        (animationWorker = new MazeSearchAnimationWorker(maze, visited, path)).addPropertyChangeListener(event -> {
+        (animationWorker = new MazeSearchAnimationWorker(maze, searchResult)).addPropertyChangeListener(event -> {
             searchButton.setText(animationWorker.isDone() ? SEARCH_BUTTON_START_TEXT : SEARCH_BUTTON_STOP_TEXT);
             searchButton.setBackground(animationWorker.isDone() ? SEARCH_BUTTON_START_COLOR : SEARCH_BUTTON_STOP_COLOR);
             clearButton.setEnabled(animationWorker.isDone());
+            searchResultLabel.setText(animationWorker.isDone() ? searchResult.toString() : SEARCH_RESULT_LABEL_TEXT);
         });
 
         animationWorker.execute();
     }
 
-    private List<NatureCell> searchMaze(Maze maze, List<NatureCell> visited) {
+    private SearchResult<NatureCell> searchMaze(Maze maze) {
         Supplier<NatureCell> initial = maze::getStart;
-        Consumer<NatureCell> consumer = visited::add;
+        Consumer<NatureCell> consumer = cell -> {};
         Predicate<NatureCell> goal = cell -> cell.equals(maze.getFinish());
 
         Function<NatureCell, List<NatureCell>> successors = cell -> {
@@ -134,7 +136,7 @@ public class MazeSearchPanel extends JPanel {
             return (cell1.getType().getWeight() + cell2.getType().getWeight()) * (distance / 2);
         };
 
-        return getSelectedSearchAlgorithm().findPath(initial, consumer, successors, weight, goal);
+        return getSelectedSearchAlgorithm().search(initial, consumer, successors, weight, goal);
     }
 
     private SearchAlgorithm<NatureCell> getSelectedSearchAlgorithm() {
@@ -147,11 +149,20 @@ public class MazeSearchPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mazeView.getMaze().clearSearchLayer();
+                searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
+                clearButton.setEnabled(false);
             }
         });
 
         clearButton.setBackground(CLEAR_BUTTON_BACKGROUND_COLOR);
         clearButton.setText(CLEAR_BUTTON_TEXT);
+        clearButton.setEnabled(false);
         add(clearButton);
+    }
+
+    private void addSearchResultLabel() {
+        searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
+        searchResultLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(searchResultLabel);
     }
 }
