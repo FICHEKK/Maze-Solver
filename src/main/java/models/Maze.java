@@ -14,6 +14,8 @@ public class Maze {
     private static final int[] DIAGONAL_OFFSET_X = new int[] {1, 1, -1, -1};
     private static final int[] DIAGONAL_OFFSET_Y = new int[] {1, -1, -1, 1};
 
+    private static final double SQUARE_ROOT_OF_2 = Math.sqrt(2);
+
     private final NatureCell[][] natureCells;
     private final SearchCell[][] searchCells;
     private final int width;
@@ -91,14 +93,10 @@ public class Maze {
         return neighbour.getType() != NatureCell.Type.WALL ? neighbour : null;
     }
 
-    public double getManhattanDistanceToFinish(Cell cell) {
-        return Math.abs(cell.getX() - finish.getX()) + Math.abs(cell.getY() - finish.getY());
-    }
-
-    public double getEuclideanDistanceToFinish(Cell cell) {
-        var dx = cell.getX() - finish.getX();
-        var dy = cell.getY() - finish.getY();
-        return Math.sqrt(dx * dx + dy * dy);
+    public double getDiagonalManhattanDistanceToFinish(Cell cell) {
+        var dx = Math.abs(cell.getX() - finish.getX());
+        var dy = Math.abs(cell.getY() - finish.getY());
+        return Math.min(dx, dy) * SQUARE_ROOT_OF_2 + Math.abs(dx - dy);
     }
 
     public void setNatureCell(int x, int y, NatureCell.Type type) {

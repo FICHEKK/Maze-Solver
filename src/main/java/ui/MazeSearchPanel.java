@@ -62,9 +62,9 @@ public class MazeSearchPanel extends JPanel {
     private void addSearchAlgorithmPicker() {
         searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
         searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
-        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
         searchAlgorithmPicker.addItem(new Dijkstra<>());
-        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeView.getMaze().getEuclideanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
 
         ((JLabel) searchAlgorithmPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         add(searchAlgorithmPicker);
