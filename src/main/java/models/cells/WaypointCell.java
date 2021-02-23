@@ -2,10 +2,10 @@ package models.cells;
 
 import java.awt.*;
 
-public final class SearchCell extends Cell {
+public class WaypointCell extends Cell {
     private Type type;
 
-    public SearchCell(int x, int y, Type type) {
+    public WaypointCell(int x, int y, Type type) {
         super(x, y);
         this.type = type;
     }
@@ -19,9 +19,8 @@ public final class SearchCell extends Cell {
     }
 
     public enum Type {
-        UNUSED(new Color(0, 0, 0, 0)),
-        STEP(new Color(0, 0, 0, 63)),
-        SOLUTION(new Color(0, 255, 0, 95));
+        START(new Color(0, 65, 193, 255)),
+        FINISH(new Color(164, 0, 181, 255));
 
         private final Color color;
 

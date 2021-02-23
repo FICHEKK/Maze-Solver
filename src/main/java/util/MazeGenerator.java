@@ -3,6 +3,7 @@ package util;
 import models.Maze;
 import models.cells.NatureCell;
 import models.cells.SearchCell;
+import models.cells.WaypointCell;
 
 import java.util.*;
 
@@ -29,7 +30,7 @@ public final class MazeGenerator {
 
         for (int y = 0; y < this.height; y++) {
             for (int x = 0; x < this.width; x++) {
-                natureCells[y][x] = new NatureCell(x, y, NatureCell.Type.WALL);
+                natureCells[y][x] = new NatureCell(x, y, NatureCell.Type.BUSH);
                 searchCells[y][x] = new SearchCell(x, y, SearchCell.Type.UNUSED);
             }
         }
@@ -62,28 +63,11 @@ public final class MazeGenerator {
             stack.push(neighbour);
         }
 
-        var start = convertRandomSearchCellTo(SearchCell.Type.START);
-        var finish = convertRandomSearchCellTo(SearchCell.Type.FINISH);
+        removeSomeWalls();
 
-        removeRandomWalls();
+        var start = new WaypointCell(0, 1, WaypointCell.Type.START);
+        var finish = new WaypointCell(width - 1, height - 2, WaypointCell.Type.FINISH);
         return new Maze(natureCells, searchCells, width, height, start, finish);
-    }
-
-    private SearchCell convertRandomSearchCellTo(SearchCell.Type type) {
-        SearchCell searchCell;
-
-        do {
-            int widthWithoutWalls = (width - 1) / 2;
-            int heightWithoutWalls = (height - 1) / 2;
-
-            var randomX = 2 * RANDOM.nextInt(widthWithoutWalls) + 1;
-            var randomY = 2 * RANDOM.nextInt(heightWithoutWalls) + 1;
-
-            searchCell = searchCells[randomY][randomX];
-        } while(searchCell.getType() != SearchCell.Type.UNUSED);
-
-        searchCell.setType(type);
-        return searchCell;
     }
 
     private List<Direction> getValidDirections(int x, int y, Set<NatureCell> visited) {
@@ -104,15 +88,18 @@ public final class MazeGenerator {
         return validDirections;
     }
 
-    private void removeRandomWalls() {
+    private void removeSomeWalls() {
         for (var y = 1; y < height - 1; y++) {
             for (var x = 1; x < width - 1; x++) {
-                if (natureCells[y][x].getType() != NatureCell.Type.WALL) continue;
+                if (natureCells[y][x].getType() != NatureCell.Type.BUSH) continue;
                 if (RANDOM.nextDouble() < wallDensity) continue;
 
                 natureCells[y][x].setType(NatureCell.Type.DIRT);
             }
         }
+
+        natureCells[1][0].setType(NatureCell.Type.DIRT);
+        natureCells[height - 2][width - 1].setType(NatureCell.Type.DIRT);
     }
 
     private enum Direction {

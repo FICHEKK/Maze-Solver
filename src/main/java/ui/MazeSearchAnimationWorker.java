@@ -61,19 +61,9 @@ public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
 
     private void displayPathSteps(int delayBetweenSteps) throws InterruptedException {
         final var path = reconstructPath(searchResult.getPathHead());
-        int index = 0;
 
         for (var cell : path) {
-            var type = SearchCell.Type.SOLUTION;
-
-            if (index == 0)
-                type = SearchCell.Type.START;
-
-            if (index == path.size() - 1)
-                type = SearchCell.Type.FINISH;
-
-            maze.setSearchCell(cell.getX(), cell.getY(), type);
-            index++;
+            maze.setSearchCell(cell.getX(), cell.getY(), SearchCell.Type.SOLUTION);
 
             if (delayBetweenSteps == NO_DELAY) continue;
             Thread.sleep(delayBetweenSteps);

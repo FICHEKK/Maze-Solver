@@ -2,7 +2,6 @@ package ui;
 
 import models.Maze;
 import models.cells.NatureCell;
-import models.cells.SearchCell;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -47,10 +46,10 @@ public class MazeEditingPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
 
-        addOutsideField(constraints);
         addBrushField(constraints);
         addRadiusField(constraints);
         addDensityField(constraints);
+        addOutsideField(constraints);
         addMazeViewMouseListeners();
     }
 
@@ -132,10 +131,10 @@ public class MazeEditingPanel extends JPanel {
             paintMazeUsingCurrentBrushSettings(maze, centerX, centerY);
         }
         else if (SwingUtilities.isMiddleMouseButton(event)) {
-            maze.setSearchCell(centerX, centerY, SearchCell.Type.START);
+            maze.setStart(centerX, centerY);
         }
         else if (SwingUtilities.isRightMouseButton(event)) {
-            maze.setSearchCell(centerX, centerY, SearchCell.Type.FINISH);
+            maze.setFinish(centerX, centerY);
         }
     }
 

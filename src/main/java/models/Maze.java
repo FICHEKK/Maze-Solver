@@ -3,6 +3,7 @@ package models;
 import models.cells.Cell;
 import models.cells.NatureCell;
 import models.cells.SearchCell;
+import models.cells.WaypointCell;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +22,12 @@ public class Maze {
     private final int width;
     private final int height;
 
-    private SearchCell start;
-    private SearchCell finish;
+    private WaypointCell start;
+    private WaypointCell finish;
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(NatureCell[][] natureCells, SearchCell[][] searchCells, int width, int height, SearchCell start, SearchCell finish) {
+    public Maze(NatureCell[][] natureCells, SearchCell[][] searchCells, int width, int height, WaypointCell start, WaypointCell finish) {
         this.natureCells = Objects.requireNonNull(natureCells);
         this.searchCells = Objects.requireNonNull(searchCells);
         this.width = width;
@@ -47,16 +48,24 @@ public class Maze {
         return natureCells[y][x];
     }
 
+    public NatureCell getNatureCellAtStart() {
+        return natureCells[start.getY()][start.getX()];
+    }
+
+    public NatureCell getNatureCellAtFinish() {
+        return natureCells[finish.getY()][finish.getX()];
+    }
+
     public SearchCell getSearchCell(int x, int y) {
         return searchCells[y][x];
     }
 
-    public NatureCell getStart() {
-        return getNatureCell(start.getX(), start.getY());
+    public WaypointCell getStart() {
+        return start;
     }
 
-    public NatureCell getFinish() {
-        return getNatureCell(finish.getX(), finish.getY());
+    public WaypointCell getFinish() {
+        return finish;
     }
 
     public List<NatureCell> getNeighbours(NatureCell cell) {
@@ -73,10 +82,10 @@ public class Maze {
             if (neighbour == null) continue;
 
             var adjacentCell1 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
-            if (adjacentCell1.getType() == NatureCell.Type.WALL) continue;
+            if (adjacentCell1.getType().getWeight() == Double.POSITIVE_INFINITY) continue;
 
             var adjacentCell2 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i + 1]][cell.getX() + STRAIGHT_OFFSET_X[i + 1]];
-            if (adjacentCell2.getType() == NatureCell.Type.WALL) continue;
+            if (adjacentCell2.getType().getWeight() == Double.POSITIVE_INFINITY) continue;
 
             neighbours.add(neighbour);
         }
@@ -90,7 +99,7 @@ public class Maze {
         if (x < 0 || x >= width || y < 0 || y >= height) return null;
 
         var neighbour = natureCells[y][x];
-        return neighbour.getType() != NatureCell.Type.WALL ? neighbour : null;
+        return neighbour.getType() != NatureCell.Type.BUSH ? neighbour : null;
     }
 
     public double getDiagonalManhattanDistanceToFinish(Cell cell) {
@@ -109,21 +118,24 @@ public class Maze {
 
     public void setSearchCell(int x, int y, SearchCell.Type type) {
         var cellBeingModified = searchCells[y][x];
-        if (cellBeingModified.getType() == type || cellBeingModified.equals(start) || cellBeingModified.equals(finish)) return;
-
-        if (type == SearchCell.Type.START) {
-            start.setType(SearchCell.Type.UNUSED);
-            listeners.forEach(listener -> listener.onSingleCellChanged(start.getX(), start.getY()));
-            start = cellBeingModified;
-        }
-        else if (type == SearchCell.Type.FINISH) {
-            finish.setType(SearchCell.Type.UNUSED);
-            listeners.forEach(listener -> listener.onSingleCellChanged(finish.getX(), finish.getY()));
-            finish = cellBeingModified;
-        }
+        if (cellBeingModified.getType() == type) return;
 
         cellBeingModified.setType(type);
         listeners.forEach(listener -> listener.onSingleCellChanged(cellBeingModified.getX(), cellBeingModified.getY()));
+    }
+
+    public void setStart(int x, int y) {
+        final var oldStart = start;
+        this.start = new WaypointCell(x, y, WaypointCell.Type.START);
+        listeners.forEach(listener -> listener.onSingleCellChanged(oldStart.getX(), oldStart.getY()));
+        listeners.forEach(listener -> listener.onSingleCellChanged(start.getX(), start.getY()));
+    }
+
+    public void setFinish(int x, int y) {
+        final var oldFinish = finish;
+        this.finish = new WaypointCell(x, y, WaypointCell.Type.FINISH);
+        listeners.forEach(listener -> listener.onSingleCellChanged(oldFinish.getX(), oldFinish.getY()));
+        listeners.forEach(listener -> listener.onSingleCellChanged(finish.getX(), finish.getY()));
     }
 
     public void clearSearchLayer() {
@@ -132,9 +144,6 @@ public class Maze {
                 searchCells[y][x].setType(SearchCell.Type.UNUSED);
             }
         }
-
-        start.setType(SearchCell.Type.START);
-        finish.setType(SearchCell.Type.FINISH);
 
         listeners.forEach(MazeListener::onMultipleCellsChanged);
     }

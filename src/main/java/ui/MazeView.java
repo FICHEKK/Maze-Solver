@@ -4,11 +4,11 @@ import models.Maze;
 import models.MazeListener;
 import models.cells.NatureCell;
 import models.cells.SearchCell;
+import models.cells.WaypointCell;
 import util.GraphicsUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public class MazeView extends JComponent {
@@ -63,7 +63,7 @@ public class MazeView extends JComponent {
         final var remainderWidth = (getWidth() - cellDimension * maze.getWidth()) / 2;
         final var remainderHeight = (getHeight() - cellDimension * maze.getHeight()) / 2;
 
-        final var clip = getClipRectangle(g);
+        final var clip = g.getClipBounds();
         final var cellStartX = Math.max(0, (clip.x - remainderWidth) / cellDimension);
         final var cellStartY = Math.max(0, (clip.y - remainderHeight) / cellDimension);
 
@@ -77,9 +77,34 @@ public class MazeView extends JComponent {
 
         for (var y = cellStartY; y < cellEndY; y++) {
             for (var x = cellStartX; x < cellEndX; x++) {
-                var searchCellType = maze.getSearchCell(x, y).getType();
-                g.setColor(searchCellType == SearchCell.Type.UNUSED ? maze.getNatureCell(x, y).getType().getColor() : searchCellType.getColor());
-                g.fillRect(x * cellDimension + remainderWidth, y * cellDimension + remainderHeight, cellDimension, cellDimension);
+                final var natureCellType = maze.getNatureCell(x, y).getType();
+                final var searchCellType = maze.getSearchCell(x, y).getType();
+
+                final var cellX = x * cellDimension + remainderWidth;
+                final var cellY = y * cellDimension + remainderHeight;
+
+                g.setColor(natureCellType.getColor());
+                g.fillRect(cellX, cellY, cellDimension, cellDimension);
+
+                if (searchCellType == SearchCell.Type.UNUSED) continue;
+
+                g.setColor(searchCellType.getColor());
+                g.fillRect(cellX, cellY, cellDimension, cellDimension);
+            }
+        }
+
+        final var waypoints = new WaypointCell[]{maze.getStart(), maze.getFinish()};
+
+        for (var waypoint : waypoints) {
+            final var x = waypoint.getX();
+            final var y = waypoint.getY();
+
+            if (x >= cellStartX && x < cellEndX && y >= cellStartY && y < cellEndY) {
+                final var cellX = x * cellDimension + remainderWidth;
+                final var cellY = y * cellDimension + remainderHeight;
+
+                g.setColor(waypoint.getType().getColor());
+                g.fillRect(cellX, cellY, cellDimension, cellDimension);
             }
         }
     }
@@ -104,22 +129,5 @@ public class MazeView extends JComponent {
         g.fillRect(0, outsideMazeHeight, outsideMazeWidth, getHeight() - outsideMazeHeight * 2);
         g.fillRect(getWidth() - outsideMazeWidth, outsideMazeHeight, outsideMazeWidth, getHeight() - outsideMazeHeight * 2);
         g.fillRect(0, getHeight() - outsideMazeHeight, getWidth(), outsideMazeHeight);
-    }
-
-    private Rectangle getClipRectangle(Graphics g) {
-        var rectangle = (Rectangle2D.Double) g.getClip();
-
-        return new Rectangle(
-                (int) Math.round(rectangle.x),
-                (int) Math.round(rectangle.y),
-                getFlooredIfApproximatelyEqualToOriginal(rectangle.width),
-                getFlooredIfApproximatelyEqualToOriginal(rectangle.height)
-        );
-    }
-
-    private int getFlooredIfApproximatelyEqualToOriginal(double value) {
-        final var epsilon = 1E-6;
-        final var flooredValue = Math.floor(value);
-        return value - flooredValue < epsilon ? (int) flooredValue : (int) (flooredValue + 1.0);
     }
 }

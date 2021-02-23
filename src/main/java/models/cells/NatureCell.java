@@ -20,10 +20,10 @@ public final class NatureCell extends Cell {
 
     public enum Type {
         DIRT(1, new Color(162, 97, 12, 255)),
-        GRAVEL(2, new Color(146, 146, 146, 255)),
-        SAND(3, new Color(255, 192, 0, 255)),
+        SAND(2, new Color(255, 192, 0, 255)),
         WATER(5, new Color(0, 146, 255, 255)),
-        WALL(Double.POSITIVE_INFINITY, new Color(5, 91, 0, 255));
+        BUSH(Double.POSITIVE_INFINITY, new Color(5, 91, 0, 255)),
+        STONE(Double.POSITIVE_INFINITY, new Color(146, 146, 146, 255));
 
         private final double weight;
         private final Color color;

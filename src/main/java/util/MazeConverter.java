@@ -3,6 +3,7 @@ package util;
 import models.Maze;
 import models.cells.NatureCell;
 import models.cells.SearchCell;
+import models.cells.WaypointCell;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -65,10 +66,10 @@ public final class MazeConverter {
                 }
             }
 
-            searchCells[startY][startX].setType(SearchCell.Type.START);
-            searchCells[finishY][finishX].setType(SearchCell.Type.FINISH);
+            var start = new WaypointCell(startX, startY, WaypointCell.Type.START);
+            var finish = new WaypointCell(finishX, finishY, WaypointCell.Type.FINISH);
 
-            return new Maze(natureCells, searchCells, width, height, searchCells[startY][startX], searchCells[finishY][finishX]);
+            return new Maze(natureCells, searchCells, width, height, start, finish);
         }
     }
 }

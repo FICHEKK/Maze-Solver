@@ -109,15 +109,10 @@ public class MazeSearchPanel extends JPanel {
     }
 
     private SearchResult<NatureCell> searchMaze(Maze maze) {
-        Supplier<NatureCell> initial = maze::getStart;
+        Supplier<NatureCell> initial = maze::getNatureCellAtStart;
         Consumer<NatureCell> consumer = cell -> {};
-        Predicate<NatureCell> goal = cell -> cell.equals(maze.getFinish());
-
-        Function<NatureCell, List<NatureCell>> successors = cell -> {
-            var neighbours = maze.getNeighbours(cell);
-            neighbours.removeIf(c -> c.getType() == NatureCell.Type.WALL);
-            return neighbours;
-        };
+        Predicate<NatureCell> goal = cell -> cell.equals(maze.getNatureCellAtFinish());
+        Function<NatureCell, List<NatureCell>> successors = maze::getNeighbours;
 
         ToDoubleBiFunction<NatureCell, NatureCell> weight = (cell1, cell2) -> {
             var dx = cell1.getX() - cell2.getX();
