@@ -8,10 +8,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class MazeGenerationPanel extends JPanel {
+    private static final Color GENERATE_BUTTON_TEXT_COLOR = Color.WHITE;
+    private static final Color GENERATE_BUTTON_BACKGROUND_COLOR = new Color(5, 91, 0, 255);
     private static final int PADDING = 10;
 
-    private static final int DEFAULT_MAZE_WIDTH = 60;
-    private static final int DEFAULT_MAZE_HEIGHT = 30;
+    private static final int DEFAULT_MAZE_WIDTH = 50;
+    private static final int DEFAULT_MAZE_HEIGHT = 50;
     private static final int MIN_DIMENSION = 4;
     private static final int MAX_DIMENSION = 1000;
 
@@ -28,38 +30,46 @@ public class MazeGenerationPanel extends JPanel {
     public MazeGenerationPanel(MazeView mazeView) {
         this.mazeView = mazeView;
 
-        setLayout(new GridLayout(1, 0, PADDING, 0));
+        setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        addWidthField();
-        addHeightField();
-        addWallDensityField();
-        addGenerateMazeButton();
-        add(new MazeSaveAndLoadPanel(mazeView));
+        var constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        constraints.ipady = 5;
+        constraints.insets = new Insets(5, 0, 5, 0);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+
+        addWidthField(constraints);
+        addHeightField(constraints);
+        addWallDensityField(constraints);
+        addGenerateMazeButton(constraints);
 
         generateMaze();
     }
 
-    private void addWidthField() {
-        add(new JLabel("Width:", JLabel.CENTER));
-        add(widthTextField);
+    private void addWidthField(GridBagConstraints constraints) {
         widthTextField.setHorizontalAlignment(SwingConstants.CENTER);
+        addComponents(constraints, new JLabel("Width:", JLabel.CENTER), widthTextField);
     }
 
-    private void addHeightField() {
-        add(new JLabel("Height:", JLabel.CENTER));
-        add(heightTextField);
+    private void addHeightField(GridBagConstraints constraints) {
         heightTextField.setHorizontalAlignment(SwingConstants.CENTER);
+        addComponents(constraints, new JLabel("Height:", JLabel.CENTER), heightTextField);
     }
 
-    private void addWallDensityField() {
+    private void addWallDensityField(GridBagConstraints constraints) {
         var wallDensityLabel = new JLabel("Wall density (" + DEFAULT_WALL_DENSITY + "%):", JLabel.CENTER);
-        add(wallDensityLabel);
-        add(wallDensitySlider);
+        wallDensityLabel.setPreferredSize(new Dimension(120, 20));
+
+        wallDensitySlider.setPreferredSize(new Dimension(80, 20));
         wallDensitySlider.addChangeListener(e -> wallDensityLabel.setText("Wall density (" + wallDensitySlider.getValue() + "%):"));
+
+        addComponents(constraints, wallDensityLabel, wallDensitySlider);
     }
 
-    private void addGenerateMazeButton() {
+    private void addGenerateMazeButton(GridBagConstraints constraints) {
         var generateMazeButton = new JButton(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +77,21 @@ public class MazeGenerationPanel extends JPanel {
             }
         });
         generateMazeButton.setText("Generate");
-        add(generateMazeButton);
+        generateMazeButton.setForeground(GENERATE_BUTTON_TEXT_COLOR);
+        generateMazeButton.setBackground(GENERATE_BUTTON_BACKGROUND_COLOR);
+
+        constraints.gridwidth = 2;
+        addComponents(constraints, generateMazeButton);
+    }
+
+    private void addComponents(GridBagConstraints constraints, JComponent... components) {
+        for (var component : components) {
+            add(component, constraints);
+            constraints.gridx++;
+        }
+
+        constraints.gridx = 0;
+        constraints.gridy++;
     }
 
     private void generateMaze() {

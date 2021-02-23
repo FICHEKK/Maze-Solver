@@ -1,6 +1,8 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 public class ApplicationView extends JFrame {
@@ -8,6 +10,7 @@ public class ApplicationView extends JFrame {
     private static final String WINDOW_TITLE = "Maze Solver";
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
+    private static final int PADDING = 20;
 
     private final MazeView mazeView = new MazeView();
 
@@ -21,12 +24,30 @@ public class ApplicationView extends JFrame {
     }
 
     private void initGUI() {
-        var controlPanel = new JPanel(new GridLayout(0, 1));
-        controlPanel.add(new MazeGenerationPanel(mazeView));
-        controlPanel.add(new MazeSearchPanel(mazeView));
-
         add(mazeView, BorderLayout.CENTER);
-        add(controlPanel, BorderLayout.SOUTH);
+        add(createControlPanel(), BorderLayout.EAST);
+    }
+
+    private JPanel createControlPanel() {
+        var controlPanel = new JPanel(new GridBagLayout());
+        controlPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
+
+        var constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weighty = 1.0;
+        constraints.gridx = 0;
+
+        controlPanel.add(wrapPanelInBorder(new MazeGenerationPanel(mazeView), "Generate "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeEditingPanel(mazeView), "Edit "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeSearchPanel(mazeView), "Search "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeSaveAndLoadPanel(mazeView), "Save / Load "), constraints);
+
+        return controlPanel;
+    }
+
+    private JPanel wrapPanelInBorder(JPanel panel, String borderTitle) {
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), borderTitle, TitledBorder.LEFT, TitledBorder.TOP));
+        return panel;
     }
 
     public static void main(String[] args) {

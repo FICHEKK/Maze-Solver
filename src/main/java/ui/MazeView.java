@@ -8,14 +8,12 @@ import util.GraphicsUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public class MazeView extends JComponent {
     private Maze maze;
-    private NatureCell.Type paintBrush = NatureCell.Type.values()[0];
+    private NatureCell.Type outsideCellType = NatureCell.Type.values()[0];
 
     public Maze getMaze() {
         return maze;
@@ -42,48 +40,13 @@ public class MazeView extends JComponent {
             }
         });
 
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handleMouseEvent(e);
-            }
-        });
-
-        addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                handleMouseEvent(e);
-            }
-        });
-
         repaint();
     }
 
-    public void setPaintBrush(NatureCell.Type paintBrush) {
-        this.paintBrush = paintBrush;
-    }
-
-    private void handleMouseEvent(MouseEvent event) {
-        final var cellDimension = getCellDimension();
-        if (cellDimension == 0) return;
-
-        final var remainderWidth = (getWidth() - cellDimension * maze.getWidth()) / 2;
-        final var remainderHeight = (getHeight() - cellDimension * maze.getHeight()) / 2;
-
-        final var x = (event.getX() - remainderWidth) / cellDimension;
-        final var y = (event.getY() - remainderHeight) / cellDimension;
-
-        if (x < 0 || x >= maze.getWidth() || y < 0 || y >= maze.getHeight()) return;
-
-        if (SwingUtilities.isLeftMouseButton(event)) {
-            maze.setNatureCell(x, y, paintBrush);
-        }
-        else if (SwingUtilities.isMiddleMouseButton(event)) {
-            maze.setSearchCell(x, y, SearchCell.Type.START);
-        }
-        else if (SwingUtilities.isRightMouseButton(event)) {
-            maze.setSearchCell(x, y, SearchCell.Type.FINISH);
-        }
+    public void setOutsideCellType(NatureCell.Type outsideCellType) {
+        if (this.outsideCellType == outsideCellType) return;
+        this.outsideCellType = outsideCellType;
+        repaint();
     }
 
     @Override
@@ -136,7 +99,7 @@ public class MazeView extends JComponent {
     }
 
     private void paintOutsideMaze(Graphics g, int outsideMazeWidth, int outsideMazeHeight) {
-        g.setColor(NatureCell.Type.WALL.getColor());
+        g.setColor(outsideCellType.getColor());
         g.fillRect(0, 0, getWidth(), outsideMazeHeight);
         g.fillRect(0, outsideMazeHeight, outsideMazeWidth, getHeight() - outsideMazeHeight * 2);
         g.fillRect(getWidth() - outsideMazeWidth, outsideMazeHeight, outsideMazeWidth, getHeight() - outsideMazeHeight * 2);

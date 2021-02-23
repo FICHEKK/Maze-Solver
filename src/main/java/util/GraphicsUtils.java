@@ -9,13 +9,13 @@ public final class GraphicsUtils {
         throw new AssertionError("GraphicsUtils should not be instantiated.");
     }
 
-    public static void drawMultilineString(Graphics g, java.util.List<String> lines, int x, int y) {
+    public static void drawMultilineString(Graphics g, List<String> lines, int x, int y) {
         for (String line : lines) {
             g.drawString(line, x, y += g.getFontMetrics().getHeight());
         }
     }
 
-    public static int getMultilineStringWidth(Graphics g, java.util.List<String> lines) {
+    public static int getMultilineStringWidth(Graphics g, List<String> lines) {
         var maxLineWidth = 0;
 
         for (String line : lines) {

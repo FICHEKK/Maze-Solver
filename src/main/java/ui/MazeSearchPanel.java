@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.util.List;
 import java.util.function.*;
 
@@ -17,11 +16,11 @@ public class MazeSearchPanel extends JPanel {
     private static final String SEARCH_BUTTON_START_TEXT = "Search";
     private static final String SEARCH_BUTTON_STOP_TEXT = "Stop";
     private static final Color SEARCH_BUTTON_TEXT_COLOR = Color.WHITE;
-    private static final Color SEARCH_BUTTON_START_COLOR = new Color(0, 134, 0, 255);
+    private static final Color SEARCH_BUTTON_START_COLOR = new Color(162, 97, 12, 255);
     private static final Color SEARCH_BUTTON_STOP_COLOR = new Color(159, 0, 0, 255);
     private static final String CLEAR_BUTTON_TEXT = "Clear";
     private static final Color CLEAR_BUTTON_BACKGROUND_COLOR = Color.WHITE;
-    private static final String SEARCH_RESULT_LABEL_TEXT = "";
+    private static final String SEARCH_RESULT_LABEL_TEXT = "Cost: - | Visited: -";
 
     private final MazeView mazeView;
     private final JComboBox<SearchAlgorithm<NatureCell>> searchAlgorithmPicker = new JComboBox<>();
@@ -34,45 +33,36 @@ public class MazeSearchPanel extends JPanel {
     public MazeSearchPanel(MazeView mazeView) {
         this.mazeView = mazeView;
 
-        setLayout(new GridLayout(1, 0, PADDING, 0));
+        setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
-        addPaintBrushPicker();
-        addSearchAlgorithmPicker();
-        addSearchButton();
-        addClearButton();
-        addSearchResultLabel();
+        var constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        constraints.weighty = 1.0;
+        constraints.ipady = 5;
+        constraints.insets = new Insets(5, 0, 5, 0);
+        constraints.anchor = GridBagConstraints.PAGE_START;
+
+        constraints.gridx = 0;
+        addSearchAlgorithmPicker(constraints);
+        addSearchButton(constraints);
+        addClearButton(constraints);
+        addSearchResultLabel(constraints);
     }
 
-    private void addPaintBrushPicker() {
-        var paintBrushPicker = new JComboBox<NatureCell.Type>();
-        ((JLabel) paintBrushPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-
-        for (var type : NatureCell.Type.values()) {
-            paintBrushPicker.addItem(type);
-        }
-
-        paintBrushPicker.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                mazeView.setPaintBrush((NatureCell.Type) paintBrushPicker.getSelectedItem());
-            }
-        });
-
-        add(paintBrushPicker);
-    }
-
-    private void addSearchAlgorithmPicker() {
-        searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
-        searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
-        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
-        searchAlgorithmPicker.addItem(new Dijkstra<>());
+    private void addSearchAlgorithmPicker(GridBagConstraints constraints) {
         searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new Dijkstra<>());
+        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
+        searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
 
         ((JLabel) searchAlgorithmPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-        add(searchAlgorithmPicker);
+        add(searchAlgorithmPicker, constraints);
     }
 
-    private void addSearchButton() {
+    private void addSearchButton(GridBagConstraints constraints) {
         searchButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -83,7 +73,7 @@ public class MazeSearchPanel extends JPanel {
         searchButton.setText(SEARCH_BUTTON_START_TEXT);
         searchButton.setForeground(SEARCH_BUTTON_TEXT_COLOR);
         searchButton.setBackground(SEARCH_BUTTON_START_COLOR);
-        add(searchButton);
+        add(searchButton, constraints);
     }
 
     private void handleSearchButtonClick() {
@@ -144,7 +134,7 @@ public class MazeSearchPanel extends JPanel {
         return ((SearchAlgorithm<NatureCell>) searchAlgorithmPicker.getSelectedItem());
     }
 
-    private void addClearButton() {
+    private void addClearButton(GridBagConstraints constraints) {
         clearButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -157,12 +147,12 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setBackground(CLEAR_BUTTON_BACKGROUND_COLOR);
         clearButton.setText(CLEAR_BUTTON_TEXT);
         clearButton.setEnabled(false);
-        add(clearButton);
+        add(clearButton, constraints);
     }
 
-    private void addSearchResultLabel() {
+    private void addSearchResultLabel(GridBagConstraints constraints) {
         searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
         searchResultLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        add(searchResultLabel);
+        add(searchResultLabel, constraints);
     }
 }
