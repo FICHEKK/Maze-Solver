@@ -38,8 +38,11 @@ public class ApplicationView extends JFrame {
         constraints.gridx = 0;
 
         controlPanel.add(wrapPanelInBorder(new MazeGenerationPanel(mazeView), "Generate "), constraints);
+        controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
         controlPanel.add(wrapPanelInBorder(new MazeEditingPanel(mazeView), "Edit "), constraints);
+        controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
         controlPanel.add(wrapPanelInBorder(new MazeSearchPanel(mazeView), "Search "), constraints);
+        controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
         controlPanel.add(wrapPanelInBorder(new MazeSaveAndLoadPanel(mazeView), "Save / Load "), constraints);
 
         return controlPanel;
