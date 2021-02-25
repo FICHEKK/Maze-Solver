@@ -82,10 +82,10 @@ public class Maze {
             if (neighbour == null) continue;
 
             var adjacentCell1 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
-            if (adjacentCell1.getType().getWeight() == Double.POSITIVE_INFINITY) continue;
+            if (!adjacentCell1.isTraversable()) continue;
 
             var adjacentCell2 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i + 1]][cell.getX() + STRAIGHT_OFFSET_X[i + 1]];
-            if (adjacentCell2.getType().getWeight() == Double.POSITIVE_INFINITY) continue;
+            if (!adjacentCell2.isTraversable()) continue;
 
             neighbours.add(neighbour);
         }
@@ -99,7 +99,7 @@ public class Maze {
         if (x < 0 || x >= width || y < 0 || y >= height) return null;
 
         var neighbour = natureCells[y][x];
-        return neighbour.getType() != NatureCell.Type.BUSH ? neighbour : null;
+        return neighbour.isTraversable() ? neighbour : null;
     }
 
     public double getDiagonalManhattanDistanceToFinish(Cell cell) {

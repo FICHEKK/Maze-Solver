@@ -18,6 +18,10 @@ public final class NatureCell extends Cell {
         this.type = type;
     }
 
+    public boolean isTraversable() {
+        return type.weight != Double.POSITIVE_INFINITY;
+    }
+
     public enum Type {
         DIRT(1, new Color(162, 97, 12, 255)),
         SAND(2, new Color(255, 192, 0, 255)),
