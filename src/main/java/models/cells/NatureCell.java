@@ -43,8 +43,11 @@ public final class NatureCell extends Cell {
 
         @Override
         public String toString() {
-            var cost = getWeight() == Double.POSITIVE_INFINITY ? "∞" : String.valueOf(getWeight());
-            return name().charAt(0) + name().substring(1).toLowerCase() + " (cost = " + cost + ")";
+            return capitalizeFirstLetter(name());
+        }
+
+        private static String capitalizeFirstLetter(String word) {
+            return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
         }
     }
 }

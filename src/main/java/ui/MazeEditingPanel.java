@@ -54,8 +54,8 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void addOutsideField(GridBagConstraints constraints) {
-        var outsidePicker = new JComboBox<>(NatureCell.Type.values());
-        ((JLabel) outsidePicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        final var outsidePicker = new JComboBox<>(NatureCell.Type.values());
+        outsidePicker.setRenderer(new NatureCellRenderer(false));
 
         outsidePicker.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -67,7 +67,7 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void addBrushField(GridBagConstraints constraints) {
-        ((JLabel) paintBrushPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        paintBrushPicker.setRenderer(new NatureCellRenderer(true));
         addComponents(constraints, new JLabel("Brush:", JLabel.CENTER), paintBrushPicker);
     }
 
