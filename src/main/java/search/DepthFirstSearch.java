@@ -24,6 +24,6 @@ public class DepthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     public String toString() {
-        return "Depth-first search (DFS)";
+        return "Depth-First Search (DFS)";
     }
 }

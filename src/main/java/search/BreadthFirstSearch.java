@@ -25,6 +25,6 @@ public class BreadthFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     public String toString() {
-        return "Breadth-first search (BFS)";
+        return "Breadth-First Search (BFS)";
     }
 }

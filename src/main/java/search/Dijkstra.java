@@ -31,6 +31,6 @@ public class Dijkstra<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     public String toString() {
-        return "Dijkstra's algorithm";
+        return "Dijkstra's Algorithm";
     }
 }

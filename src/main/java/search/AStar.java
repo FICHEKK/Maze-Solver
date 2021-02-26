@@ -40,6 +40,6 @@ public class AStar<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     public String toString() {
-        return "A* search algorithm";
+        return "A* Search Algorithm";
     }
 }

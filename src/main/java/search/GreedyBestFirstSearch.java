@@ -31,6 +31,6 @@ public class GreedyBestFirstSearch<S> extends AbstractSearchAlgorithm<S> {
 
     @Override
     public String toString() {
-        return "Greedy best-first search";
+        return "Greedy Best-First Search";
     }
 }

@@ -94,6 +94,6 @@ public final class RecursiveBacktracker implements MazeGenerator {
 
     @Override
     public String toString() {
-        return "Recursive backtracker";
+        return "Recursive Backtracker";
     }
 }
