@@ -1,11 +1,15 @@
 package ui;
 
-import util.MazeGenerator;
+import generators.MazeGenerator;
+import generators.RecursiveBacktracker;
+import models.cells.NatureCell;
+import transformers.MazeReplacer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class MazeGenerationPanel extends JPanel {
     private static final Color GENERATE_BUTTON_TEXT_COLOR = Color.WHITE;
@@ -23,6 +27,7 @@ public class MazeGenerationPanel extends JPanel {
 
     private final MazeView mazeView;
 
+    private final JComboBox<MazeGenerator> mazeGeneratorPicker = new JComboBox<>();
     private final JTextField widthTextField = new JTextField(String.valueOf(DEFAULT_MAZE_WIDTH));
     private final JTextField heightTextField = new JTextField(String.valueOf(DEFAULT_MAZE_HEIGHT));
     private final JSlider wallDensitySlider = new JSlider(MIN_WALL_DENSITY, MAX_WALL_DENSITY, DEFAULT_WALL_DENSITY);
@@ -41,12 +46,18 @@ public class MazeGenerationPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
 
+        addMazeGeneratorPicker(constraints);
         addWidthField(constraints);
         addHeightField(constraints);
         addWallDensityField(constraints);
         addGenerateMazeButton(constraints);
 
         generateMaze();
+    }
+
+    private void addMazeGeneratorPicker(GridBagConstraints constraints) {
+        mazeGeneratorPicker.addItem(new RecursiveBacktracker());
+        addComponents(constraints, new JLabel("Generator:", JLabel.CENTER), mazeGeneratorPicker);
     }
 
     private void addWidthField(GridBagConstraints constraints) {
@@ -105,9 +116,14 @@ public class MazeGenerationPanel extends JPanel {
             if (height < MIN_DIMENSION || height > MAX_DIMENSION)
                 throw new NumberFormatException("Height must be in range [" + MIN_DIMENSION + ", " + MAX_DIMENSION + "].");
 
+            var maze = getSelectedMazeGenerator().generate(width, height);
+
+            var replacer = new MazeReplacer();
             var wallDensity = (double) wallDensitySlider.getValue() / MAX_WALL_DENSITY;
-            var mazeGenerator = new MazeGenerator(width, height, wallDensity);
-            mazeView.setMaze(mazeGenerator.generate());
+            replacer.addTypeReplacements(NatureCell.Type.BUSH, List.of(new MazeReplacer.Replacement(NatureCell.Type.DIRT, 1 - wallDensity)));
+            replacer.transform(maze);
+
+            mazeView.setMaze(maze);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
@@ -119,5 +135,9 @@ public class MazeGenerationPanel extends JPanel {
         } catch (NumberFormatException ex) {
             throw new NumberFormatException("'" + string + "' is not a valid integer value.");
         }
+    }
+
+    private MazeGenerator getSelectedMazeGenerator() {
+        return (MazeGenerator) mazeGeneratorPicker.getSelectedItem();
     }
 }

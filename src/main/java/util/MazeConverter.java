@@ -2,7 +2,6 @@ package util;
 
 import models.Maze;
 import models.cells.NatureCell;
-import models.cells.SearchCell;
 import models.cells.WaypointCell;
 
 import java.io.*;
@@ -45,31 +44,23 @@ public final class MazeConverter {
         try (var inputStream = new DataInputStream(new GZIPInputStream(new BufferedInputStream(new FileInputStream(source))))) {
             var width = (int) inputStream.readShort();
             var height = (int) inputStream.readShort();
-
             var bytes = inputStream.readNBytes(width * height);
-
-            var startX = (int) inputStream.readShort();
-            var startY = (int) inputStream.readShort();
-            var finishX = (int) inputStream.readShort();
-            var finishY = (int) inputStream.readShort();
 
             var types = NatureCell.Type.values();
             var natureCells = new NatureCell[height][width];
-            var searchCells = new SearchCell[height][width];
 
             var index = 0;
 
             for (var y = 0; y < height; y++) {
                 for (var x = 0; x < width; x++) {
                     natureCells[y][x] = new NatureCell(x, y, types[bytes[index++]]);
-                    searchCells[y][x] = new SearchCell(x, y, SearchCell.Type.UNUSED);
                 }
             }
 
-            var start = new WaypointCell(startX, startY, WaypointCell.Type.START);
-            var finish = new WaypointCell(finishX, finishY, WaypointCell.Type.FINISH);
+            var start = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.START);
+            var finish = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.FINISH);
 
-            return new Maze(natureCells, searchCells, width, height, start, finish);
+            return new Maze(natureCells, start, finish);
         }
     }
 }

@@ -27,13 +27,23 @@ public class Maze {
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(NatureCell[][] natureCells, SearchCell[][] searchCells, int width, int height, WaypointCell start, WaypointCell finish) {
+    public Maze(NatureCell[][] natureCells, WaypointCell start, WaypointCell finish) {
         this.natureCells = Objects.requireNonNull(natureCells);
-        this.searchCells = Objects.requireNonNull(searchCells);
-        this.width = width;
-        this.height = height;
         this.start = Objects.requireNonNull(start);
         this.finish = Objects.requireNonNull(finish);
+
+        this.width = natureCells[0].length;
+        this.height = natureCells.length;
+        this.searchCells = new SearchCell[height][width];
+
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                if (natureCells[y][x] == null)
+                    throw new NullPointerException("Nature cell cannot be null.");
+
+                searchCells[y][x] = new SearchCell(x, y, SearchCell.Type.UNUSED);
+            }
+        }
     }
 
     public int getWidth() {
