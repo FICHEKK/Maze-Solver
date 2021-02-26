@@ -1,7 +1,7 @@
 package ui;
 
 import models.Maze;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import search.*;
 
 import javax.swing.*;
@@ -23,7 +23,7 @@ public class MazeSearchPanel extends JPanel {
     private static final String SEARCH_RESULT_LABEL_TEXT = "Cost: - | Visited: -";
 
     private final MazeView mazeView;
-    private final JComboBox<SearchAlgorithm<NatureCell>> searchAlgorithmPicker = new JComboBox<>();
+    private final JComboBox<SearchAlgorithm<TerrainCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton searchButton = new JButton();
     private final JButton clearButton = new JButton();
     private final JLabel searchResultLabel = new JLabel();
@@ -108,13 +108,13 @@ public class MazeSearchPanel extends JPanel {
         animationWorker.execute();
     }
 
-    private SearchResult<NatureCell> searchMaze(Maze maze) {
-        Supplier<NatureCell> initial = maze::getNatureCellAtStart;
-        Consumer<NatureCell> consumer = cell -> {};
-        Predicate<NatureCell> goal = cell -> cell.equals(maze.getNatureCellAtFinish());
-        Function<NatureCell, List<NatureCell>> successors = maze::getNeighbours;
+    private SearchResult<TerrainCell> searchMaze(Maze maze) {
+        Supplier<TerrainCell> initial = maze::getTerrainCellAtStart;
+        Consumer<TerrainCell> consumer = cell -> {};
+        Predicate<TerrainCell> goal = cell -> cell.equals(maze.getTerrainCellAtFinish());
+        Function<TerrainCell, List<TerrainCell>> successors = maze::getNeighbours;
 
-        ToDoubleBiFunction<NatureCell, NatureCell> weight = (cell1, cell2) -> {
+        ToDoubleBiFunction<TerrainCell, TerrainCell> weight = (cell1, cell2) -> {
             var dx = cell1.getX() - cell2.getX();
             var dy = cell1.getY() - cell2.getY();
             var distance = Math.sqrt(dx * dx + dy * dy);
@@ -124,9 +124,9 @@ public class MazeSearchPanel extends JPanel {
         return getSelectedSearchAlgorithm().search(initial, consumer, successors, weight, goal);
     }
 
-    private SearchAlgorithm<NatureCell> getSelectedSearchAlgorithm() {
+    private SearchAlgorithm<TerrainCell> getSelectedSearchAlgorithm() {
         //noinspection unchecked
-        return ((SearchAlgorithm<NatureCell>) searchAlgorithmPicker.getSelectedItem());
+        return ((SearchAlgorithm<TerrainCell>) searchAlgorithmPicker.getSelectedItem());
     }
 
     private void addClearButton(GridBagConstraints constraints) {

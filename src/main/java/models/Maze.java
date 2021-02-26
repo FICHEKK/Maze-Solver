@@ -1,7 +1,7 @@
 package models;
 
 import models.cells.Cell;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import models.cells.SearchCell;
 import models.cells.WaypointCell;
 
@@ -17,7 +17,7 @@ public class Maze {
 
     private static final double SQUARE_ROOT_OF_2 = Math.sqrt(2);
 
-    private final NatureCell[][] natureCells;
+    private final TerrainCell[][] terrainCells;
     private final SearchCell[][] searchCells;
     private final int width;
     private final int height;
@@ -27,19 +27,19 @@ public class Maze {
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(NatureCell[][] natureCells, WaypointCell start, WaypointCell finish) {
-        this.natureCells = Objects.requireNonNull(natureCells);
+    public Maze(TerrainCell[][] terrainCells, WaypointCell start, WaypointCell finish) {
+        this.terrainCells = Objects.requireNonNull(terrainCells);
         this.start = Objects.requireNonNull(start);
         this.finish = Objects.requireNonNull(finish);
 
-        this.width = natureCells[0].length;
-        this.height = natureCells.length;
+        this.width = terrainCells[0].length;
+        this.height = terrainCells.length;
         this.searchCells = new SearchCell[height][width];
 
         for (var y = 0; y < height; y++) {
             for (var x = 0; x < width; x++) {
-                if (natureCells[y][x] == null)
-                    throw new NullPointerException("Nature cell cannot be null.");
+                if (terrainCells[y][x] == null)
+                    throw new NullPointerException("Terrain cell cannot be null.");
 
                 searchCells[y][x] = new SearchCell(x, y, SearchCell.Type.UNUSED);
             }
@@ -54,16 +54,16 @@ public class Maze {
         return height;
     }
 
-    public NatureCell getNatureCell(int x, int y) {
-        return natureCells[y][x];
+    public TerrainCell getTerrainCell(int x, int y) {
+        return terrainCells[y][x];
     }
 
-    public NatureCell getNatureCellAtStart() {
-        return natureCells[start.getY()][start.getX()];
+    public TerrainCell getTerrainCellAtStart() {
+        return terrainCells[start.getY()][start.getX()];
     }
 
-    public NatureCell getNatureCellAtFinish() {
-        return natureCells[finish.getY()][finish.getX()];
+    public TerrainCell getTerrainCellAtFinish() {
+        return terrainCells[finish.getY()][finish.getX()];
     }
 
     public SearchCell getSearchCell(int x, int y) {
@@ -78,8 +78,8 @@ public class Maze {
         return finish;
     }
 
-    public List<NatureCell> getNeighbours(NatureCell cell) {
-        final var neighbours = new ArrayList<NatureCell>();
+    public List<TerrainCell> getNeighbours(TerrainCell cell) {
+        final var neighbours = new ArrayList<TerrainCell>();
 
         for (var i = 0; i < 4; i++) {
             var neighbour = getNeighbour(cell, STRAIGHT_OFFSET_X[i], STRAIGHT_OFFSET_Y[i]);
@@ -91,10 +91,10 @@ public class Maze {
             var neighbour = getNeighbour(cell, DIAGONAL_OFFSET_X[i], DIAGONAL_OFFSET_Y[i]);
             if (neighbour == null) continue;
 
-            var adjacentCell1 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
+            var adjacentCell1 = terrainCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
             if (!adjacentCell1.isTraversable()) continue;
 
-            var adjacentCell2 = natureCells[cell.getY() + STRAIGHT_OFFSET_Y[i + 1]][cell.getX() + STRAIGHT_OFFSET_X[i + 1]];
+            var adjacentCell2 = terrainCells[cell.getY() + STRAIGHT_OFFSET_Y[i + 1]][cell.getX() + STRAIGHT_OFFSET_X[i + 1]];
             if (!adjacentCell2.isTraversable()) continue;
 
             neighbours.add(neighbour);
@@ -103,12 +103,12 @@ public class Maze {
         return neighbours;
     }
 
-    private NatureCell getNeighbour(NatureCell anchor, int offsetX, int offsetY) {
+    private TerrainCell getNeighbour(TerrainCell anchor, int offsetX, int offsetY) {
         var x = anchor.getX() + offsetX;
         var y = anchor.getY() + offsetY;
         if (x < 0 || x >= width || y < 0 || y >= height) return null;
 
-        var neighbour = natureCells[y][x];
+        var neighbour = terrainCells[y][x];
         return neighbour.isTraversable() ? neighbour : null;
     }
 
@@ -118,8 +118,8 @@ public class Maze {
         return Math.min(dx, dy) * SQUARE_ROOT_OF_2 + Math.abs(dx - dy);
     }
 
-    public void setNatureCell(int x, int y, NatureCell.Type type) {
-        var cellBeingModified = natureCells[y][x];
+    public void setTerrainCell(int x, int y, TerrainCell.Type type) {
+        var cellBeingModified = terrainCells[y][x];
         if (cellBeingModified.getType() == type) return;
 
         cellBeingModified.setType(type);

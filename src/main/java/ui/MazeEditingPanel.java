@@ -1,7 +1,7 @@
 package ui;
 
 import models.Maze;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,7 +27,7 @@ public class MazeEditingPanel extends JPanel {
     private static final Dimension DENSITY_LABEL_DIMENSION = new Dimension(100, 20);
 
     private final MazeView mazeView;
-    private final JComboBox<NatureCell.Type> paintBrushPicker = new JComboBox<>(NatureCell.Type.values());
+    private final JComboBox<TerrainCell.Type> paintBrushPicker = new JComboBox<>(TerrainCell.Type.values());
     private final JSlider paintBrushRadiusSlider = new JSlider(MIN_RADIUS, MAX_RADIUS, DEFAULT_RADIUS);
     private final JSlider paintBrushDensitySlider = new JSlider(MIN_DENSITY, MAX_DENSITY, DEFAULT_DENSITY);
 
@@ -54,12 +54,12 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void addOutsideField(GridBagConstraints constraints) {
-        final var outsidePicker = new JComboBox<>(NatureCell.Type.values());
-        outsidePicker.setRenderer(new NatureCellRenderer(false));
+        final var outsidePicker = new JComboBox<>(TerrainCell.Type.values());
+        outsidePicker.setRenderer(new TerrainCellRenderer(false));
 
         outsidePicker.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                mazeView.setOutsideCellType((NatureCell.Type) outsidePicker.getSelectedItem());
+                mazeView.setOutsideCellType((TerrainCell.Type) outsidePicker.getSelectedItem());
             }
         });
 
@@ -67,7 +67,7 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void addBrushField(GridBagConstraints constraints) {
-        paintBrushPicker.setRenderer(new NatureCellRenderer(true));
+        paintBrushPicker.setRenderer(new TerrainCellRenderer(true));
         addComponents(constraints, new JLabel("Brush:", JLabel.CENTER), paintBrushPicker);
     }
 
@@ -148,7 +148,7 @@ public class MazeEditingPanel extends JPanel {
                 if (RANDOM.nextDouble() > paintBrushDensity) continue;
                 if (Math.hypot(centerX - x, centerY - y) > paintBrushRadius) continue;
 
-                maze.setNatureCell(x, y, (NatureCell.Type) paintBrushPicker.getSelectedItem());
+                maze.setTerrainCell(x, y, (TerrainCell.Type) paintBrushPicker.getSelectedItem());
             }
         }
     }

@@ -1,7 +1,7 @@
 package util;
 
 import models.Maze;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import models.cells.WaypointCell;
 
 import java.io.*;
@@ -18,7 +18,7 @@ public final class MazeConverter {
         try (var outputStream = new DataOutputStream(new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(destination))))) {
             outputStream.writeShort(maze.getWidth());
             outputStream.writeShort(maze.getHeight());
-            outputStream.write(convertMazeNatureCellsToByteArray(maze));
+            outputStream.write(convertMazeTerrainCellsToByteArray(maze));
 
             outputStream.writeShort(maze.getStart().getX());
             outputStream.writeShort(maze.getStart().getY());
@@ -27,13 +27,13 @@ public final class MazeConverter {
         }
     }
 
-    private static byte[] convertMazeNatureCellsToByteArray(Maze maze) {
+    private static byte[] convertMazeTerrainCellsToByteArray(Maze maze) {
         final var bytes = new byte[maze.getWidth() * maze.getHeight()];
         var index = 0;
 
         for (var y = 0; y < maze.getHeight(); y++) {
             for (var x = 0; x < maze.getWidth(); x++) {
-                bytes[index++] = (byte) maze.getNatureCell(x, y).getType().ordinal();
+                bytes[index++] = (byte) maze.getTerrainCell(x, y).getType().ordinal();
             }
         }
 
@@ -46,21 +46,21 @@ public final class MazeConverter {
             var height = (int) inputStream.readShort();
             var bytes = inputStream.readNBytes(width * height);
 
-            var types = NatureCell.Type.values();
-            var natureCells = new NatureCell[height][width];
+            var types = TerrainCell.Type.values();
+            var terrainCells = new TerrainCell[height][width];
 
             var index = 0;
 
             for (var y = 0; y < height; y++) {
                 for (var x = 0; x < width; x++) {
-                    natureCells[y][x] = new NatureCell(x, y, types[bytes[index++]]);
+                    terrainCells[y][x] = new TerrainCell(x, y, types[bytes[index++]]);
                 }
             }
 
             var start = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.START);
             var finish = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.FINISH);
 
-            return new Maze(natureCells, start, finish);
+            return new Maze(terrainCells, start, finish);
         }
     }
 }

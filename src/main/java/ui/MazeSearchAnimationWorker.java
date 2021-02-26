@@ -1,7 +1,7 @@
 package ui;
 
 import models.Maze;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import models.cells.SearchCell;
 import search.SearchNode;
 import search.SearchResult;
@@ -15,9 +15,9 @@ public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
     private static final int STEP_DELAY = 10;
 
     private final Maze maze;
-    private final SearchResult<NatureCell> searchResult;
+    private final SearchResult<TerrainCell> searchResult;
 
-    public MazeSearchAnimationWorker(Maze maze, SearchResult<NatureCell> searchResult) {
+    public MazeSearchAnimationWorker(Maze maze, SearchResult<TerrainCell> searchResult) {
         this.maze = maze;
         this.searchResult = searchResult;
     }
@@ -70,8 +70,8 @@ public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
         }
     }
 
-    private List<NatureCell> reconstructPath(SearchNode<NatureCell> pathHead) {
-        var path = new LinkedList<NatureCell>();
+    private List<TerrainCell> reconstructPath(SearchNode<TerrainCell> pathHead) {
+        var path = new LinkedList<TerrainCell>();
 
         for (var node = pathHead; node != null; node = node.getParent()) {
             path.addFirst(node.getState());

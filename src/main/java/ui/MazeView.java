@@ -2,7 +2,7 @@ package ui;
 
 import models.Maze;
 import models.MazeListener;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import models.cells.SearchCell;
 import models.cells.WaypointCell;
 import util.GraphicsUtils;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MazeView extends JComponent {
     private Maze maze;
-    private NatureCell.Type outsideCellType = NatureCell.Type.values()[0];
+    private TerrainCell.Type outsideCellType = TerrainCell.Type.values()[0];
 
     public Maze getMaze() {
         return maze;
@@ -43,7 +43,7 @@ public class MazeView extends JComponent {
         repaint();
     }
 
-    public void setOutsideCellType(NatureCell.Type outsideCellType) {
+    public void setOutsideCellType(TerrainCell.Type outsideCellType) {
         if (this.outsideCellType == outsideCellType) return;
         this.outsideCellType = outsideCellType;
         repaint();
@@ -77,13 +77,13 @@ public class MazeView extends JComponent {
 
         for (var y = cellStartY; y < cellEndY; y++) {
             for (var x = cellStartX; x < cellEndX; x++) {
-                final var natureCellType = maze.getNatureCell(x, y).getType();
+                final var terrainCellType = maze.getTerrainCell(x, y).getType();
                 final var searchCellType = maze.getSearchCell(x, y).getType();
 
                 final var cellX = x * cellDimension + remainderWidth;
                 final var cellY = y * cellDimension + remainderHeight;
 
-                g.setColor(natureCellType.getColor());
+                g.setColor(terrainCellType.getColor());
                 g.fillRect(cellX, cellY, cellDimension, cellDimension);
 
                 if (searchCellType == SearchCell.Type.UNUSED) continue;

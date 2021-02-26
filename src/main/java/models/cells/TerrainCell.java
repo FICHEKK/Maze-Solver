@@ -2,10 +2,10 @@ package models.cells;
 
 import java.awt.*;
 
-public final class NatureCell extends Cell {
+public final class TerrainCell extends Cell {
     private Type type;
 
-    public NatureCell(int x, int y, Type type) {
+    public TerrainCell(int x, int y, Type type) {
         super(x, y);
         this.type = type;
     }

@@ -2,7 +2,7 @@ package ui;
 
 import generators.MazeGenerator;
 import generators.RecursiveBacktracker;
-import models.cells.NatureCell;
+import models.cells.TerrainCell;
 import transformers.MazeReplacer;
 
 import javax.swing.*;
@@ -120,7 +120,7 @@ public class MazeGenerationPanel extends JPanel {
 
             var replacer = new MazeReplacer();
             var wallDensity = (double) wallDensitySlider.getValue() / MAX_WALL_DENSITY;
-            replacer.addTypeReplacements(NatureCell.Type.BUSH, List.of(new MazeReplacer.Replacement(NatureCell.Type.DIRT, 1 - wallDensity)));
+            replacer.addTypeReplacements(TerrainCell.Type.BUSH, List.of(new MazeReplacer.Replacement(TerrainCell.Type.DIRT, 1 - wallDensity)));
             replacer.transform(maze);
 
             mazeView.setMaze(maze);
