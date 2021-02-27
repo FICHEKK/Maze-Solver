@@ -1,47 +1,18 @@
 package generators;
 
-import models.Maze;
-import models.cells.FinishCell;
-import models.cells.StartCell;
 import models.cells.TerrainCell;
 
 import java.util.*;
 
-public final class RecursiveBacktracker implements MazeGenerator {
-    private static final Random RANDOM = new Random();
-    private static final TerrainCell.Type PATH_TYPE = TerrainCell.Type.DIRT;
-    private static final TerrainCell.Type WALL_TYPE = TerrainCell.Type.BUSH;
-
-    private int width;
-    private int height;
-    private TerrainCell[][] terrainCells;
+public final class RecursiveBacktracker extends AbstractMazeGenerator {
 
     @Override
-    public Maze generate(int widthWithoutWalls, int heightWithoutWalls) {
-        createMazeMadeFullyOutOfWalls(widthWithoutWalls, heightWithoutWalls);
-        carveOutMazePath();
-
-        return new Maze(terrainCells, new StartCell(1, 1), new FinishCell(width - 2, height - 2));
-    }
-
-    private void createMazeMadeFullyOutOfWalls(int widthWithoutWalls, int heightWithoutWalls) {
-        width = widthWithoutWalls * 2 + 1;
-        height = heightWithoutWalls * 2 + 1;
-        terrainCells = new TerrainCell[height][width];
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                terrainCells[y][x] = new TerrainCell(x, y, WALL_TYPE);
-            }
-        }
-    }
-
-    private void carveOutMazePath() {
+    protected void carveOutMazePath() {
         final var stack = initializeStack();
         final var visited = new HashSet<TerrainCell>();
 
         while (!stack.isEmpty()) {
-            visitUppermostCell(stack.peek(), stack, visited);
+            visitNewestCell(stack.peek(), stack, visited);
         }
     }
 
@@ -51,7 +22,7 @@ public final class RecursiveBacktracker implements MazeGenerator {
         return stack;
     }
 
-    private void visitUppermostCell(TerrainCell cell, Stack<TerrainCell> stack, Set<TerrainCell> visited) {
+    private void visitNewestCell(TerrainCell cell, Stack<TerrainCell> stack, Set<TerrainCell> visited) {
         cell.setType(PATH_TYPE);
         visited.add(cell);
         moveToRandomValidDirection(cell, stack, getValidDirections(cell.getX(), cell.getY(), visited));
