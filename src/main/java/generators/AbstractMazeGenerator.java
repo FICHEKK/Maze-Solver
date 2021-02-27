@@ -12,6 +12,12 @@ public abstract class AbstractMazeGenerator implements MazeGenerator {
     protected static final TerrainCell.Type PATH_TYPE = TerrainCell.Type.DIRT;
     protected static final TerrainCell.Type WALL_TYPE = TerrainCell.Type.BUSH;
 
+    protected static final int GAP_SIZE = 2;
+    protected static final int FIRST_ROW = 1;
+    protected static final int FIRST_COLUMN = 1;
+    protected static final int SECOND_ROW = FIRST_ROW + GAP_SIZE;
+    protected static final int SECOND_COLUMN = FIRST_COLUMN + GAP_SIZE;
+
     protected TerrainCell[][] terrainCells;
     protected int width;
     protected int height;
@@ -20,7 +26,7 @@ public abstract class AbstractMazeGenerator implements MazeGenerator {
     public Maze generate(int widthWithoutWalls, int heightWithoutWalls) {
         createMazeMadeFullyOutOfWalls(widthWithoutWalls, heightWithoutWalls);
         carveOutMazePath();
-        return new Maze(terrainCells, new StartCell(1, 1), new FinishCell(width - 2, height - 2));
+        return new Maze(terrainCells, new StartCell(FIRST_ROW, FIRST_COLUMN), new FinishCell(width - GAP_SIZE, height - GAP_SIZE));
     }
 
     private void createMazeMadeFullyOutOfWalls(int widthWithoutWalls, int heightWithoutWalls) {
@@ -28,9 +34,9 @@ public abstract class AbstractMazeGenerator implements MazeGenerator {
         this.height = heightWithoutWalls * 2 + 1;
         this.terrainCells = new TerrainCell[height][width];
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                terrainCells[y][x] = new TerrainCell(x, y, WALL_TYPE);
+        for (int row = 0; row < height; row++) {
+            for (int column = 0; column < width; column++) {
+                terrainCells[row][column] = new TerrainCell(column, row, WALL_TYPE);
             }
         }
     }

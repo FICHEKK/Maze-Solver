@@ -3,6 +3,7 @@ package ui;
 import generators.BinaryTree;
 import generators.MazeGenerator;
 import generators.RecursiveBacktracker;
+import generators.Sidewinder;
 import models.MazeHolder;
 import models.cells.TerrainCell;
 import transformers.MazeReplacer;
@@ -60,6 +61,7 @@ public class MazeGenerationPanel extends JPanel {
     private void addMazeGeneratorPicker(GridBagConstraints constraints) {
         mazeGeneratorPicker.addItem(new RecursiveBacktracker());
         mazeGeneratorPicker.addItem(new BinaryTree());
+        mazeGeneratorPicker.addItem(new Sidewinder());
         addComponents(constraints, new JLabel("Generator:", JLabel.CENTER), mazeGeneratorPicker);
     }
 

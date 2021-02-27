@@ -18,7 +18,7 @@ public final class RecursiveBacktracker extends AbstractMazeGenerator {
 
     private Stack<TerrainCell> initializeStack() {
         final var stack = new Stack<TerrainCell>();
-        stack.push(terrainCells[1][1]);
+        stack.push(terrainCells[FIRST_ROW][FIRST_COLUMN]);
         return stack;
     }
 
@@ -34,17 +34,17 @@ public final class RecursiveBacktracker extends AbstractMazeGenerator {
             return;
         }
 
-        var randomDirection = validDirections.get(RANDOM.nextInt(validDirections.size()));
+        final var randomDirection = validDirections.get(RANDOM.nextInt(validDirections.size()));
 
-        var intermediate = terrainCells[cell.getY() + randomDirection.offsetY][cell.getX() + randomDirection.offsetX];
+        final var intermediate = terrainCells[cell.getY() + randomDirection.offsetY][cell.getX() + randomDirection.offsetX];
         intermediate.setType(PATH_TYPE);
 
-        var neighbour = terrainCells[cell.getY() + randomDirection.offsetY * 2][cell.getX() + randomDirection.offsetX * 2];
+        final var neighbour = terrainCells[cell.getY() + randomDirection.offsetY * 2][cell.getX() + randomDirection.offsetX * 2];
         stack.push(neighbour);
     }
 
     private List<Direction> getValidDirections(int x, int y, Set<TerrainCell> visited) {
-        var validDirections = new ArrayList<Direction>();
+        final var validDirections = new ArrayList<Direction>();
 
         if (y >= 2 && !visited.contains(terrainCells[y - 2][x]))
             validDirections.add(Direction.NORTH);

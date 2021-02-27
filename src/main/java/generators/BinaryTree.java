@@ -1,18 +1,34 @@
 package generators;
 
-import java.util.ArrayList;
-
 public class BinaryTree extends AbstractMazeGenerator {
 
     @Override
     protected void carveOutMazePath() {
-        for (var row = 1; row < height; row += 2) {
+        carveOutFirstRow();
+        carveOutFirstColumn();
+        carveOutRestOfTheRows();
+    }
+
+    private void carveOutFirstRow() {
+        for (var column = FIRST_COLUMN; column < width - 1; column++) {
+            terrainCells[FIRST_ROW][column].setType(PATH_TYPE);
+        }
+    }
+
+    private void carveOutFirstColumn() {
+        for (var row = FIRST_ROW; row < height - 1; row++) {
+            terrainCells[row][FIRST_COLUMN].setType(PATH_TYPE);
+        }
+    }
+
+    private void carveOutRestOfTheRows() {
+        for (var row = SECOND_ROW; row < height; row += GAP_SIZE) {
             carveOutRow(row);
         }
     }
 
     private void carveOutRow(int row) {
-        for (var column = 1; column < width; column += 2) {
+        for (var column = SECOND_COLUMN; column < width; column += GAP_SIZE) {
             carveOutCell(row, column);
         }
     }
@@ -21,16 +37,14 @@ public class BinaryTree extends AbstractMazeGenerator {
         final var cell = terrainCells[row][column];
         cell.setType(PATH_TYPE);
 
-        final var validDirections = new ArrayList<Direction>();
+        final var shouldCarveNorth = RANDOM.nextBoolean();
 
-        if (row > 1) validDirections.add(Direction.NORTH);
-        if (column > 1) validDirections.add(Direction.WEST);
-
-        if (validDirections.isEmpty()) return;
-
-        var randomDirection = validDirections.get(RANDOM.nextInt(validDirections.size()));
-        terrainCells[cell.getY() + randomDirection.offsetY][cell.getX() + randomDirection.offsetX].setType(PATH_TYPE);
-        terrainCells[cell.getY() + randomDirection.offsetY * 2][cell.getX() + randomDirection.offsetX * 2].setType(PATH_TYPE);
+        if (shouldCarveNorth) {
+            terrainCells[cell.getY() - 1][cell.getX()].setType(PATH_TYPE);
+        }
+        else {
+            terrainCells[cell.getY()][cell.getX() - 1].setType(PATH_TYPE);
+        }
     }
 
     @Override
