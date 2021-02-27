@@ -1,8 +1,9 @@
 package util;
 
 import models.Maze;
+import models.cells.FinishCell;
+import models.cells.StartCell;
 import models.cells.TerrainCell;
-import models.cells.WaypointCell;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -57,8 +58,8 @@ public final class MazeConverter {
                 }
             }
 
-            var start = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.START);
-            var finish = new WaypointCell(inputStream.readShort(), inputStream.readShort(), WaypointCell.Type.FINISH);
+            var start = new StartCell(inputStream.readShort(), inputStream.readShort());
+            var finish = new FinishCell(inputStream.readShort(), inputStream.readShort());
 
             return new Maze(terrainCells, start, finish);
         }

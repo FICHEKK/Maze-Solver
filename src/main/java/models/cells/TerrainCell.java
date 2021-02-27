@@ -22,6 +22,11 @@ public final class TerrainCell extends Cell {
         return type.weight != Double.POSITIVE_INFINITY;
     }
 
+    @Override
+    public Color getColor() {
+        return type.getColor();
+    }
+
     public enum Type {
         DIRT(1, new Color(162, 97, 12, 255)),
         SAND(2, new Color(255, 192, 0, 255)),

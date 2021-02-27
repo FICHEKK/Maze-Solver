@@ -1,9 +1,6 @@
 package models;
 
-import models.cells.Cell;
-import models.cells.TerrainCell;
-import models.cells.SearchCell;
-import models.cells.WaypointCell;
+import models.cells.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +19,12 @@ public class Maze {
     private final int width;
     private final int height;
 
-    private WaypointCell start;
-    private WaypointCell finish;
+    private StartCell start;
+    private FinishCell finish;
 
     private final List<MazeListener> listeners = new ArrayList<>();
 
-    public Maze(TerrainCell[][] terrainCells, WaypointCell start, WaypointCell finish) {
+    public Maze(TerrainCell[][] terrainCells, StartCell start, FinishCell finish) {
         this.terrainCells = Objects.requireNonNull(terrainCells);
         this.start = Objects.requireNonNull(start);
         this.finish = Objects.requireNonNull(finish);
@@ -70,11 +67,11 @@ public class Maze {
         return searchCells[y][x];
     }
 
-    public WaypointCell getStart() {
+    public StartCell getStart() {
         return start;
     }
 
-    public WaypointCell getFinish() {
+    public FinishCell getFinish() {
         return finish;
     }
 
@@ -136,14 +133,14 @@ public class Maze {
 
     public void setStart(int x, int y) {
         final var oldStart = start;
-        this.start = new WaypointCell(x, y, WaypointCell.Type.START);
+        this.start = new StartCell(x, y);
         listeners.forEach(listener -> listener.onSingleCellChanged(oldStart.getX(), oldStart.getY()));
         listeners.forEach(listener -> listener.onSingleCellChanged(start.getX(), start.getY()));
     }
 
     public void setFinish(int x, int y) {
         final var oldFinish = finish;
-        this.finish = new WaypointCell(x, y, WaypointCell.Type.FINISH);
+        this.finish = new FinishCell(x, y);
         listeners.forEach(listener -> listener.onSingleCellChanged(oldFinish.getX(), oldFinish.getY()));
         listeners.forEach(listener -> listener.onSingleCellChanged(finish.getX(), finish.getY()));
     }

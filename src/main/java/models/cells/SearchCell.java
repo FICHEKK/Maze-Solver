@@ -18,6 +18,11 @@ public final class SearchCell extends Cell {
         this.type = type;
     }
 
+    @Override
+    public Color getColor() {
+        return type.getColor();
+    }
+
     public enum Type {
         UNUSED(new Color(0, 0, 0, 0)),
         STEP(new Color(0, 0, 0, 63)),

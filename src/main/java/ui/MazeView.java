@@ -2,9 +2,9 @@ package ui;
 
 import models.Maze;
 import models.MazeListener;
+import models.cells.Cell;
 import models.cells.TerrainCell;
 import models.cells.SearchCell;
-import models.cells.WaypointCell;
 import util.GraphicsUtils;
 
 import javax.swing.*;
@@ -74,7 +74,11 @@ public class MazeView extends JComponent {
         final var cellEndY = clip.width == getWidth() ? maze.getHeight() : Math.min(maze.getHeight(), cellStartY + cellCountHeight);
 
         paintOutsideMaze(g, remainderWidth + 1, remainderHeight + 1);
+        paintMaze(g, cellDimension, remainderWidth, remainderHeight, cellStartX, cellStartY, cellEndX, cellEndY);
+        paintWaypoints(g, cellDimension, remainderWidth, remainderHeight, cellStartX, cellStartY, cellEndX, cellEndY);
+    }
 
+    private void paintMaze(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
         for (var y = cellStartY; y < cellEndY; y++) {
             for (var x = cellStartX; x < cellEndX; x++) {
                 final var terrainCellType = maze.getTerrainCell(x, y).getType();
@@ -92,8 +96,10 @@ public class MazeView extends JComponent {
                 g.fillRect(cellX, cellY, cellDimension, cellDimension);
             }
         }
+    }
 
-        final var waypoints = new WaypointCell[]{maze.getStart(), maze.getFinish()};
+    private void paintWaypoints(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
+        final var waypoints = new Cell[]{maze.getStart(), maze.getFinish()};
 
         for (var waypoint : waypoints) {
             final var x = waypoint.getX();
@@ -103,7 +109,7 @@ public class MazeView extends JComponent {
                 final var cellX = x * cellDimension + remainderWidth;
                 final var cellY = y * cellDimension + remainderHeight;
 
-                g.setColor(waypoint.getType().getColor());
+                g.setColor(waypoint.getColor());
                 g.fillRect(cellX, cellY, cellDimension, cellDimension);
             }
         }

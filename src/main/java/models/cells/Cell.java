@@ -1,5 +1,7 @@
 package models.cells;
 
+import java.awt.*;
+
 public abstract class Cell {
     private final int x;
     private final int y;
@@ -16,6 +18,8 @@ public abstract class Cell {
     public int getY() {
         return y;
     }
+
+    public abstract Color getColor();
 
     @Override
     public boolean equals(Object o) {

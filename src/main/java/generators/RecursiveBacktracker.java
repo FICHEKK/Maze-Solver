@@ -1,8 +1,9 @@
 package generators;
 
 import models.Maze;
+import models.cells.FinishCell;
+import models.cells.StartCell;
 import models.cells.TerrainCell;
-import models.cells.WaypointCell;
 
 import java.util.*;
 
@@ -20,10 +21,7 @@ public final class RecursiveBacktracker implements MazeGenerator {
         createMazeMadeFullyOutOfWalls(widthWithoutWalls, heightWithoutWalls);
         carveOutMazePath();
 
-        final var start = new WaypointCell(1, 1, WaypointCell.Type.START);
-        final var finish = new WaypointCell(width - 2, height - 2, WaypointCell.Type.FINISH);
-
-        return new Maze(terrainCells, start, finish);
+        return new Maze(terrainCells, new StartCell(1, 1), new FinishCell(width - 2, height - 2));
     }
 
     private void createMazeMadeFullyOutOfWalls(int widthWithoutWalls, int heightWithoutWalls) {
