@@ -1,5 +1,6 @@
 package ui;
 
+import models.MazeHolder;
 import util.MazeConverter;
 
 import javax.swing.*;
@@ -22,10 +23,10 @@ public class MazeSaveAndLoadPanel extends JPanel {
     private static final String SAVE_ACTION_TEXT = "Save";
     private static final String LOAD_ACTION_TEXT = "Load";
 
-    private final MazeView mazeView;
+    private final MazeHolder mazeHolder;
 
-    public MazeSaveAndLoadPanel(MazeView mazeView) {
-        this.mazeView = mazeView;
+    public MazeSaveAndLoadPanel(MazeHolder mazeHolder) {
+        this.mazeHolder = mazeHolder;
 
         setLayout(new GridBagLayout());
         var constraints = new GridBagConstraints();
@@ -51,7 +52,7 @@ public class MazeSaveAndLoadPanel extends JPanel {
                 var destination = new File(fileChooser.getSelectedFile() + "." + SAVE_FILE_EXTENSION);
 
                 try {
-                    MazeConverter.serialize(mazeView.getMaze(), destination);
+                    MazeConverter.serialize(mazeHolder.getMaze(), destination);
                     showMessage("Success", "Maze was successfully saved to " + destination.getAbsolutePath() + ".", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException exception) {
                     showMessage("Error", "Maze could not be saved to " + destination.getAbsolutePath() + ".", JOptionPane.ERROR_MESSAGE);
@@ -78,7 +79,7 @@ public class MazeSaveAndLoadPanel extends JPanel {
                 var source = fileChooser.getSelectedFile();
 
                 try {
-                    mazeView.setMaze(MazeConverter.deserialize(source));
+                    mazeHolder.setMaze(MazeConverter.deserialize(source));
                     showMessage("Success", "Maze was successfully loaded from " + source.getAbsolutePath() + ".", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException exception) {
                     showMessage("Error", "Maze could not be loaded from " + source.getAbsolutePath() + ".", JOptionPane.ERROR_MESSAGE);

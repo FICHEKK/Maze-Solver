@@ -1,10 +1,11 @@
 package ui;
 
 import models.Maze;
+import models.MazeHolder;
 import models.MazeListener;
 import models.cells.Cell;
-import models.cells.TerrainCell;
 import models.cells.SearchCell;
+import models.cells.TerrainCell;
 import util.GraphicsUtils;
 
 import javax.swing.*;
@@ -12,17 +13,20 @@ import java.awt.*;
 import java.util.List;
 
 public class MazeView extends JComponent {
-    private Maze maze;
+    private final MazeHolder mazeHolder;
     private TerrainCell.Type outsideCellType = TerrainCell.Type.values()[0];
 
-    public Maze getMaze() {
-        return maze;
+    public MazeView(MazeHolder mazeHolder) {
+        this.mazeHolder = mazeHolder;
+
+        mazeHolder.addListener(maze -> {
+            subscribeToNewMaze(maze);
+            repaint();
+        });
     }
 
-    public void setMaze(Maze maze) {
-        this.maze = maze;
-
-        this.maze.addListener(new MazeListener() {
+    private void subscribeToNewMaze(Maze maze) {
+        maze.addListener(new MazeListener() {
             @Override
             public void onSingleCellChanged(int x, int y) {
                 final var cellDimension = getCellDimension();
@@ -39,8 +43,6 @@ public class MazeView extends JComponent {
                 repaint();
             }
         });
-
-        repaint();
     }
 
     public void setOutsideCellType(TerrainCell.Type outsideCellType) {
@@ -51,6 +53,7 @@ public class MazeView extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
+        final var maze = mazeHolder.getMaze();
         if (maze == null) return;
 
         final var cellDimension = getCellDimension();
@@ -79,6 +82,8 @@ public class MazeView extends JComponent {
     }
 
     private void paintMaze(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
+        final var maze = mazeHolder.getMaze();
+
         for (var y = cellStartY; y < cellEndY; y++) {
             for (var x = cellStartX; x < cellEndX; x++) {
                 final var terrainCellType = maze.getTerrainCell(x, y).getType();
@@ -99,6 +104,7 @@ public class MazeView extends JComponent {
     }
 
     private void paintWaypoints(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
+        final var maze = mazeHolder.getMaze();
         final var waypoints = new Cell[]{maze.getStart(), maze.getFinish()};
 
         for (var waypoint : waypoints) {
@@ -116,6 +122,7 @@ public class MazeView extends JComponent {
     }
 
     private int getCellDimension() {
+        final var maze = mazeHolder.getMaze();
         return Math.min(getWidth() / maze.getWidth(), getHeight() / maze.getHeight());
     }
 

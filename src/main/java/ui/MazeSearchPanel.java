@@ -1,6 +1,7 @@
 package ui;
 
 import models.Maze;
+import models.MazeHolder;
 import models.cells.TerrainCell;
 import search.*;
 
@@ -22,7 +23,7 @@ public class MazeSearchPanel extends JPanel {
     private static final Color CLEAR_BUTTON_BACKGROUND_COLOR = Color.WHITE;
     private static final String SEARCH_RESULT_LABEL_TEXT = "Cost: - | Visited: -";
 
-    private final MazeView mazeView;
+    private final MazeHolder mazeHolder;
     private final JComboBox<SearchAlgorithm<TerrainCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton searchButton = new JButton();
     private final JButton clearButton = new JButton();
@@ -30,8 +31,9 @@ public class MazeSearchPanel extends JPanel {
 
     private MazeSearchAnimationWorker animationWorker;
 
-    public MazeSearchPanel(MazeView mazeView) {
-        this.mazeView = mazeView;
+    public MazeSearchPanel(MazeHolder mazeHolder) {
+        this.mazeHolder = mazeHolder;
+        this.mazeHolder.addListener(maze -> handleMazeChange());
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
@@ -51,10 +53,19 @@ public class MazeSearchPanel extends JPanel {
         addSearchResultLabel(constraints);
     }
 
+    private void handleMazeChange() {
+        if (isAnimationWorkerRunning()) {
+            stopAnimationWorker();
+        }
+
+        searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
+        clearButton.setEnabled(false);
+    }
+
     private void addSearchAlgorithmPicker(GridBagConstraints constraints) {
-        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeHolder.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
         searchAlgorithmPicker.addItem(new Dijkstra<>());
-        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeView.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeHolder.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
         searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
         searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
 
@@ -95,7 +106,7 @@ public class MazeSearchPanel extends JPanel {
     }
 
     private void startAnimationWorker() {
-        var maze = mazeView.getMaze();
+        var maze = mazeHolder.getMaze();
         var searchResult = searchMaze(maze);
 
         (animationWorker = new MazeSearchAnimationWorker(maze, searchResult)).addPropertyChangeListener(event -> {
@@ -133,7 +144,7 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeView.getMaze().clearSearchLayer();
+                mazeHolder.getMaze().clearSearchLayer();
                 searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
                 clearButton.setEnabled(false);
             }

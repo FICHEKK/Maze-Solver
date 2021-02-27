@@ -2,6 +2,7 @@ package ui;
 
 import generators.MazeGenerator;
 import generators.RecursiveBacktracker;
+import models.MazeHolder;
 import models.cells.TerrainCell;
 import transformers.MazeReplacer;
 
@@ -25,15 +26,15 @@ public class MazeGenerationPanel extends JPanel {
     private static final int DEFAULT_WALL_DENSITY = 100;
     private static final int MAX_WALL_DENSITY = 100;
 
-    private final MazeView mazeView;
+    private final MazeHolder mazeHolder;
 
     private final JComboBox<MazeGenerator> mazeGeneratorPicker = new JComboBox<>();
     private final JTextField widthTextField = new JTextField(String.valueOf(DEFAULT_MAZE_WIDTH));
     private final JTextField heightTextField = new JTextField(String.valueOf(DEFAULT_MAZE_HEIGHT));
     private final JSlider wallDensitySlider = new JSlider(MIN_WALL_DENSITY, MAX_WALL_DENSITY, DEFAULT_WALL_DENSITY);
 
-    public MazeGenerationPanel(MazeView mazeView) {
-        this.mazeView = mazeView;
+    public MazeGenerationPanel(MazeHolder mazeHolder) {
+        this.mazeHolder = mazeHolder;
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
@@ -123,7 +124,7 @@ public class MazeGenerationPanel extends JPanel {
             replacer.addTypeReplacements(TerrainCell.Type.BUSH, List.of(new MazeReplacer.Replacement(TerrainCell.Type.DIRT, 1 - wallDensity)));
             replacer.transform(maze);
 
-            mazeView.setMaze(maze);
+            mazeHolder.setMaze(maze);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }

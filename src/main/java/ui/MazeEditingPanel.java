@@ -1,6 +1,7 @@
 package ui;
 
 import models.Maze;
+import models.MazeHolder;
 import models.cells.TerrainCell;
 
 import javax.swing.*;
@@ -27,12 +28,14 @@ public class MazeEditingPanel extends JPanel {
     private static final Dimension DENSITY_LABEL_DIMENSION = new Dimension(100, 20);
 
     private final MazeView mazeView;
+    private final MazeHolder mazeHolder;
     private final JComboBox<TerrainCell.Type> paintBrushPicker = new JComboBox<>(TerrainCell.Type.values());
     private final JSlider paintBrushRadiusSlider = new JSlider(MIN_RADIUS, MAX_RADIUS, DEFAULT_RADIUS);
     private final JSlider paintBrushDensitySlider = new JSlider(MIN_DENSITY, MAX_DENSITY, DEFAULT_DENSITY);
 
-    public MazeEditingPanel(MazeView mazeView) {
+    public MazeEditingPanel(MazeView mazeView, MazeHolder mazeHolder) {
         this.mazeView = mazeView;
+        this.mazeHolder = mazeHolder;
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
@@ -117,7 +120,7 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void handleMouseEvent(MouseEvent event) {
-        final var maze = mazeView.getMaze();
+        final var maze = mazeHolder.getMaze();
         final var cellDimension = Math.min(mazeView.getWidth() / maze.getWidth(), mazeView.getHeight() / maze.getHeight());
         if (cellDimension == 0) return;
 
