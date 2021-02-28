@@ -3,6 +3,7 @@ package ui;
 import models.Maze;
 import models.MazeHolder;
 import models.cells.TerrainCell;
+import ui.selection.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -29,7 +30,10 @@ public class MazeEditingPanel extends JPanel {
 
     private final MazeView mazeView;
     private final MazeHolder mazeHolder;
-    private final JComboBox<TerrainCell.Type> paintBrushPicker = new JComboBox<>(TerrainCell.Type.values());
+
+    private final SelectionModel<TerrainCell.Type> paintBrushModel = new ExactlyOneSelectionModel<>(TerrainCell.Type.first());
+    private final SelectionModel<TerrainCell.Type> indestructibleCellsModel = new MultipleSelectionModel<>();
+
     private final JSlider paintBrushRadiusSlider = new JSlider(MIN_RADIUS, MAX_RADIUS, DEFAULT_RADIUS);
     private final JSlider paintBrushDensitySlider = new JSlider(MIN_DENSITY, MAX_DENSITY, DEFAULT_DENSITY);
 
@@ -49,29 +53,28 @@ public class MazeEditingPanel extends JPanel {
         constraints.gridx = 0;
         constraints.gridy = 0;
 
-        addBrushField(constraints);
+        addPaintBrushPicker(constraints);
+        addIndestructibleCellsSelector(constraints);
         addRadiusField(constraints);
         addDensityField(constraints);
-        addOutsideField(constraints);
+        addOutsideBrushPicker(constraints);
         addMazeViewMouseListeners();
     }
 
-    private void addOutsideField(GridBagConstraints constraints) {
-        final var outsidePicker = new JComboBox<>(TerrainCell.Type.values());
-        outsidePicker.setRenderer(new TerrainCellRenderer(false));
-
-        outsidePicker.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                mazeView.setOutsideCellType((TerrainCell.Type) outsidePicker.getSelectedItem());
-            }
-        });
-
-        addComponents(constraints, new JLabel("Outside:", JLabel.CENTER), outsidePicker);
+    private void addPaintBrushPicker(GridBagConstraints constraints) {
+        final var paintBrushPicker = new SelectionView<>(TerrainCell.Type.values(), paintBrushModel);
+        paintBrushPicker.setEditable(true);
+        paintBrushPicker.setEditor(new TerrainCellSelectionEditor(paintBrushModel));
+        paintBrushPicker.setRenderer(new TerrainCellSelectionRenderer(true, paintBrushModel));
+        addComponents(constraints, new JLabel("Brush:", JLabel.CENTER), paintBrushPicker);
     }
 
-    private void addBrushField(GridBagConstraints constraints) {
-        paintBrushPicker.setRenderer(new TerrainCellRenderer(true));
-        addComponents(constraints, new JLabel("Brush:", JLabel.CENTER), paintBrushPicker);
+    private void addIndestructibleCellsSelector(GridBagConstraints constraints) {
+        final var indestructibleCellsSelector = new SelectionView<>(TerrainCell.Type.values(), indestructibleCellsModel);
+        indestructibleCellsSelector.setEditable(true);
+        indestructibleCellsSelector.setEditor(new TerrainCellSelectionEditor(indestructibleCellsModel));
+        indestructibleCellsSelector.setRenderer(new TerrainCellSelectionRenderer(false, indestructibleCellsModel));
+        addComponents(constraints, new JLabel("Indestructible:", JLabel.CENTER), indestructibleCellsSelector);
     }
 
     private void addRadiusField(GridBagConstraints constraints) {
@@ -91,6 +94,22 @@ public class MazeEditingPanel extends JPanel {
         paintBrushDensitySlider.addChangeListener(e -> densityLabel.setText("Density (" + paintBrushDensitySlider.getValue() + "%):"));
 
         addComponents(constraints, densityLabel, paintBrushDensitySlider);
+    }
+
+    private void addOutsideBrushPicker(GridBagConstraints constraints) {
+        final var outsideBrushModel = new ExactlyOneSelectionModel<>(TerrainCell.Type.first());
+        final var outsideBrushPicker = new SelectionView<>(TerrainCell.Type.values(), outsideBrushModel);
+        outsideBrushPicker.setEditable(true);
+        outsideBrushPicker.setEditor(new TerrainCellSelectionEditor(outsideBrushModel));
+        outsideBrushPicker.setRenderer(new TerrainCellSelectionRenderer(false, outsideBrushModel));
+
+        outsideBrushPicker.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                mazeView.setOutsideCellType((TerrainCell.Type) outsideBrushPicker.getSelectedItem());
+            }
+        });
+
+        addComponents(constraints, new JLabel("Outside:", JLabel.CENTER), outsideBrushPicker);
     }
 
     private void addComponents(GridBagConstraints constraints, JComponent... components) {
@@ -144,14 +163,17 @@ public class MazeEditingPanel extends JPanel {
     private void paintMazeUsingCurrentBrushSettings(Maze maze, int centerX, int centerY) {
         final var paintBrushRadius = paintBrushRadiusSlider.getValue();
         final var paintBrushDensity = paintBrushDensitySlider.getValue() / 100.0;
+        final var paintBrushType = paintBrushModel.getSelectedItems().iterator().next();
+        final var indestructibleCellTypes = indestructibleCellsModel.getSelectedItems();
 
         for (var y = centerY - paintBrushRadius; y <= centerY + paintBrushRadius; y++) {
             for (var x = centerX - paintBrushRadius; x <= centerX + paintBrushRadius; x++) {
                 if (x < 0 || x >= maze.getWidth() || y < 0 || y >= maze.getHeight()) continue;
+                if (indestructibleCellTypes.contains(maze.getTerrainCell(x, y).getType())) continue;
                 if (RANDOM.nextDouble() > paintBrushDensity) continue;
                 if (Math.hypot(centerX - x, centerY - y) > paintBrushRadius) continue;
 
-                maze.setTerrainCell(x, y, (TerrainCell.Type) paintBrushPicker.getSelectedItem());
+                maze.setTerrainCell(x, y, paintBrushType);
             }
         }
     }

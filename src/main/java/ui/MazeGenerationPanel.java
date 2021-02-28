@@ -60,6 +60,8 @@ public class MazeGenerationPanel extends JPanel {
         mazeGeneratorPicker.addItem(new BinaryTree());
         mazeGeneratorPicker.addItem(new Sidewinder());
         mazeGeneratorPicker.addItem(new Prim());
+
+        ((JLabel) mazeGeneratorPicker.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         addComponents(constraints, new JLabel("Generator:", JLabel.CENTER), mazeGeneratorPicker);
     }
 

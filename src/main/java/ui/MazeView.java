@@ -14,7 +14,7 @@ import java.util.List;
 
 public class MazeView extends JComponent {
     private final MazeHolder mazeHolder;
-    private TerrainCell.Type outsideCellType = TerrainCell.Type.values()[0];
+    private TerrainCell.Type outsideCellType = TerrainCell.Type.first();
 
     public MazeView(MazeHolder mazeHolder) {
         this.mazeHolder = mazeHolder;

@@ -42,6 +42,10 @@ public final class TerrainCell extends Cell {
             this.color = color;
         }
 
+        public static Type first() {
+            return values()[0];
+        }
+
         public double getWeight() {
             return weight;
         }

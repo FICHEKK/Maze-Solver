@@ -5,9 +5,13 @@ import models.cells.TerrainCell;
 import javax.swing.*;
 import java.awt.*;
 
-public class TerrainCellRenderer extends JComponent implements ListCellRenderer<TerrainCell.Type> {
-    private static final Color SELECTED_BACKGROUND_COLOR = Color.LIGHT_GRAY;
+public class TerrainCellView extends JComponent {
+    private static final Color HOVERED_BACKGROUND_COLOR = Color.LIGHT_GRAY;
+    private static final Color TICK_MARK_COLOR = Color.BLACK;
     private static final Color TEXT_COLOR = Color.BLACK;
+
+    private static final int TICK_MARK_DIMENSION = 8;
+    private static final int TICK_MARK_HORIZONTAL_PADDING = 5;
 
     private static final int TEXT_HORIZONTAL_PADDING = 10;
     private static final int TEXT_VERTICAL_PADDING = 5;
@@ -17,21 +21,23 @@ public class TerrainCellRenderer extends JComponent implements ListCellRenderer<
 
     private TerrainCell.Type terrainCellType;
     private boolean isSelected;
+    private boolean isHovered;
     private final boolean showCost;
 
-    public TerrainCellRenderer(boolean showCost) {
+    public TerrainCellView(boolean showCost) {
         this.showCost = showCost;
-    }
-
-    @Override
-    public Component getListCellRendererComponent(JList<? extends TerrainCell.Type> list, TerrainCell.Type value, int index, boolean isSelected, boolean cellHasFocus) {
-        this.isSelected = isSelected;
-        setTerrainCellType(value);
-        return this;
     }
 
     public void setTerrainCellType(TerrainCell.Type terrainCellType) {
         this.terrainCellType = terrainCellType;
+    }
+
+    public void setHovered(boolean hovered) {
+        isHovered = hovered;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     @Override
@@ -44,24 +50,37 @@ public class TerrainCellRenderer extends JComponent implements ListCellRenderer<
 
     @Override
     protected void paintComponent(Graphics g) {
+        if (isHovered) {
+            paintHoveredBackground(g);
+        }
+
         if (isSelected) {
-            paintSelectedBackground(g);
+            paintSelectedTickMark(g);
         }
 
         paintText(g);
         paintTerrainCell(g);
     }
 
-    private void paintSelectedBackground(Graphics g) {
-        g.setColor(SELECTED_BACKGROUND_COLOR);
+    private void paintHoveredBackground(Graphics g) {
+        g.setColor(HOVERED_BACKGROUND_COLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
     }
 
+    private void paintSelectedTickMark(Graphics g) {
+        final var y = (getHeight() - TICK_MARK_DIMENSION) / 2;
+
+        g.setColor(TICK_MARK_COLOR);
+        g.fillOval(TICK_MARK_HORIZONTAL_PADDING, y, TICK_MARK_DIMENSION, TICK_MARK_DIMENSION);
+    }
+
     private void paintText(Graphics g) {
-        final var width = getWidth() - TERRAIN_CELL_DIMENSION - TERRAIN_CELL_HORIZONTAL_PADDING * 2;
+        final var tickWidth = TICK_MARK_DIMENSION + TICK_MARK_HORIZONTAL_PADDING * 2;
+        final var cellWidth = TERRAIN_CELL_DIMENSION + TERRAIN_CELL_HORIZONTAL_PADDING * 2;
+        final var width = getWidth() -  tickWidth - cellWidth;
 
         final var textWidth = g.getFontMetrics().stringWidth(getText());
-        final var x = (width - textWidth) / 2;
+        final var x = (width - textWidth) / 2 + tickWidth;
 
         final var textHeight = g.getFontMetrics().getHeight();
         final var y = getHeight() / 2 + textHeight / 3;
