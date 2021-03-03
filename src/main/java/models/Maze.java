@@ -75,17 +75,37 @@ public class Maze {
         return finish;
     }
 
-    public List<TerrainCell> getNeighbours(TerrainCell cell) {
+    public List<TerrainCell> getFourAdjacentNeighbours(TerrainCell cell) {
+        return getFourNeighbours(cell, STRAIGHT_OFFSET_X, STRAIGHT_OFFSET_Y);
+    }
+
+    public List<TerrainCell> getFourDiagonalNeighbours(TerrainCell cell) {
+        return getFourNeighbours(cell, DIAGONAL_OFFSET_X, DIAGONAL_OFFSET_Y);
+    }
+
+    private List<TerrainCell> getFourNeighbours(TerrainCell cell, int[] offsetX, int[] offsetY) {
         final var neighbours = new ArrayList<TerrainCell>();
 
         for (var i = 0; i < 4; i++) {
-            var neighbour = getNeighbour(cell, STRAIGHT_OFFSET_X[i], STRAIGHT_OFFSET_Y[i]);
+            var neighbour = getNeighbour(cell, offsetX[i], offsetY[i]);
+            if (neighbour == null) continue;
+            neighbours.add(neighbour);
+        }
+
+        return neighbours;
+    }
+
+    public List<TerrainCell> getEightNeighboursConsideringTraversal(TerrainCell cell) {
+        final var neighbours = new ArrayList<TerrainCell>();
+
+        for (var i = 0; i < 4; i++) {
+            var neighbour = getNeighbourConsideringTraversal(cell, STRAIGHT_OFFSET_X[i], STRAIGHT_OFFSET_Y[i]);
             if (neighbour == null) continue;
             neighbours.add(neighbour);
         }
 
         for (var i = 0; i < 4; i++) {
-            var neighbour = getNeighbour(cell, DIAGONAL_OFFSET_X[i], DIAGONAL_OFFSET_Y[i]);
+            var neighbour = getNeighbourConsideringTraversal(cell, DIAGONAL_OFFSET_X[i], DIAGONAL_OFFSET_Y[i]);
             if (neighbour == null) continue;
 
             var adjacentCell1 = terrainCells[cell.getY() + STRAIGHT_OFFSET_Y[i]][cell.getX() + STRAIGHT_OFFSET_X[i]];
@@ -100,13 +120,16 @@ public class Maze {
         return neighbours;
     }
 
-    private TerrainCell getNeighbour(TerrainCell anchor, int offsetX, int offsetY) {
-        var x = anchor.getX() + offsetX;
-        var y = anchor.getY() + offsetY;
-        if (x < 0 || x >= width || y < 0 || y >= height) return null;
-
-        var neighbour = terrainCells[y][x];
+    private TerrainCell getNeighbourConsideringTraversal(TerrainCell anchor, int offsetX, int offsetY) {
+        final var neighbour = getNeighbour(anchor, offsetX, offsetY);
+        if (neighbour == null) return null;
         return neighbour.isTraversable() ? neighbour : null;
+    }
+
+    private TerrainCell getNeighbour(TerrainCell anchor, int offsetX, int offsetY) {
+        final var x = anchor.getX() + offsetX;
+        final var y = anchor.getY() + offsetY;
+        return x >= 0 && x < width && y >= 0 && y < height ? terrainCells[y][x] : null;
     }
 
     public double getDiagonalManhattanDistanceToFinish(Cell cell) {

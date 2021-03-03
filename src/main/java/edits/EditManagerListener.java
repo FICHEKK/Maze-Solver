@@ -1,8 +1,12 @@
 package edits;
 
 public interface EditManagerListener {
-    void onUndoStackEmpty();
-    void onUndoStackNotEmpty();
-    void onRedoStackEmpty();
-    void onRedoStackNotEmpty();
+
+    default void onUndoStackEmpty() { }
+
+    default void onUndoStackNotEmpty() { }
+
+    default void onRedoStackEmpty() { }
+
+    default void onRedoStackNotEmpty() { }
 }

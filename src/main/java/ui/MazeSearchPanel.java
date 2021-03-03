@@ -123,7 +123,7 @@ public class MazeSearchPanel extends JPanel {
         Supplier<TerrainCell> initial = maze::getTerrainCellAtStart;
         Consumer<TerrainCell> consumer = cell -> {};
         Predicate<TerrainCell> goal = cell -> cell.equals(maze.getTerrainCellAtFinish());
-        Function<TerrainCell, List<TerrainCell>> successors = maze::getNeighbours;
+        Function<TerrainCell, List<TerrainCell>> successors = maze::getEightNeighboursConsideringTraversal;
 
         ToDoubleBiFunction<TerrainCell, TerrainCell> weight = (cell1, cell2) -> {
             var dx = cell1.getX() - cell2.getX();
