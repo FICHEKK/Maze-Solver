@@ -29,8 +29,6 @@ public class MazeEditingPanel extends JPanel {
     private static final Dimension DENSITY_LABEL_DIMENSION = new Dimension(100, 20);
 
     private final MazeView mazeView;
-    private final MazeHolder mazeHolder;
-
     private final JComboBox<Tool> toolbox = new JComboBox<>();
     private final SelectionModel<TerrainCell.Type> brushModel = new ExactlyOneSelectionModel<>(TerrainCell.Type.first());
     private final SelectionModel<TerrainCell.Type> indestructibleCellsModel = new MultipleSelectionModel<>();
@@ -38,9 +36,8 @@ public class MazeEditingPanel extends JPanel {
     private final JSlider brushRadiusSlider = new JSlider(MIN_RADIUS, MAX_RADIUS, DEFAULT_RADIUS);
     private final JSlider brushDensitySlider = new JSlider(MIN_DENSITY, MAX_DENSITY, DEFAULT_DENSITY);
 
-    public MazeEditingPanel(MazeView mazeView, MazeHolder mazeHolder) {
+    public MazeEditingPanel(MazeView mazeView) {
         this.mazeView = mazeView;
-        this.mazeHolder = mazeHolder;
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
@@ -72,16 +69,15 @@ public class MazeEditingPanel extends JPanel {
 
     private void addToolbox(GridBagConstraints constraints) {
         toolbox.addItem(new BrushTool(
-                mazeHolder,
                 brushRadiusSlider::getValue,
                 () -> brushDensitySlider.getValue() / 100.0,
                 this::getSelectedBrushType,
                 indestructibleCellsModel::getSelectedItems
         ));
 
-        toolbox.addItem(new BucketTool(mazeHolder, this::getSelectedBrushType));
-        toolbox.addItem(new StartMarkerTool(mazeHolder));
-        toolbox.addItem(new FinishMarkerTool(mazeHolder));
+        toolbox.addItem(new BucketTool(this::getSelectedBrushType));
+        toolbox.addItem(new StartMarkerTool());
+        toolbox.addItem(new FinishMarkerTool());
 
         ((JLabel) toolbox.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         addComponents(constraints, new JLabel("Toolbox:", JLabel.CENTER), toolbox);
@@ -180,7 +176,7 @@ public class MazeEditingPanel extends JPanel {
     }
 
     private void handleMouseEvent(MouseEvent event, TriConsumer<Integer, Integer, MouseEvent> consumer) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         final var cellDimension = Math.min(mazeView.getWidth() / maze.getWidth(), mazeView.getHeight() / maze.getHeight());
         if (cellDimension == 0) return;
 

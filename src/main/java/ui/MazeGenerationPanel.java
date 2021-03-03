@@ -1,7 +1,6 @@
 package ui;
 
 import generators.*;
-import models.MazeHolder;
 import ui.buttons.GenerateMazeButton;
 
 import javax.swing.*;
@@ -18,12 +17,17 @@ public class MazeGenerationPanel extends JPanel {
     private static final int DEFAULT_WALL_DENSITY = 100;
     private static final int MAX_WALL_DENSITY = 100;
 
+    private static final int GENERATE_BUTTON_GRID_WIDTH = 2;
+
+    private static final Dimension WALL_DENSITY_SLIDER_DIMENSION = new Dimension(80, 20);
+    private static final Dimension WALL_DENSITY_LABEL_DIMENSION = new Dimension(120, 20);
+
     private final JComboBox<MazeGenerator> mazeGeneratorPicker = new JComboBox<>();
     private final JTextField widthTextField = new JTextField(String.valueOf(DEFAULT_MAZE_WIDTH));
     private final JTextField heightTextField = new JTextField(String.valueOf(DEFAULT_MAZE_HEIGHT));
     private final JSlider wallDensitySlider = new JSlider(MIN_WALL_DENSITY, MAX_WALL_DENSITY, DEFAULT_WALL_DENSITY);
 
-    public MazeGenerationPanel(MazeHolder mazeHolder) {
+    public MazeGenerationPanel() {
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
@@ -32,7 +36,7 @@ public class MazeGenerationPanel extends JPanel {
         addWidthField(constraints);
         addHeightField(constraints);
         addWallDensityField(constraints);
-        addGenerateMazeButton(constraints, mazeHolder);
+        addGenerateMazeButton(constraints);
     }
 
     private GridBagConstraints initializeConstraints() {
@@ -68,17 +72,17 @@ public class MazeGenerationPanel extends JPanel {
 
     private void addWallDensityField(GridBagConstraints constraints) {
         var wallDensityLabel = new JLabel("Wall density (" + DEFAULT_WALL_DENSITY + "%):", JLabel.CENTER);
-        wallDensityLabel.setPreferredSize(new Dimension(120, 20));
+        wallDensityLabel.setPreferredSize(WALL_DENSITY_LABEL_DIMENSION);
 
-        wallDensitySlider.setPreferredSize(new Dimension(80, 20));
+        wallDensitySlider.setPreferredSize(WALL_DENSITY_SLIDER_DIMENSION);
         wallDensitySlider.addChangeListener(e -> wallDensityLabel.setText("Wall density (" + wallDensitySlider.getValue() + "%):"));
 
         addComponents(constraints, wallDensityLabel, wallDensitySlider);
     }
 
-    private void addGenerateMazeButton(GridBagConstraints constraints, MazeHolder mazeHolder) {
-        final var generateMazeButton = new GenerateMazeButton(mazeHolder, mazeGeneratorPicker, widthTextField, heightTextField, wallDensitySlider);
-        constraints.gridwidth = 2;
+    private void addGenerateMazeButton(GridBagConstraints constraints) {
+        final var generateMazeButton = new GenerateMazeButton(mazeGeneratorPicker, widthTextField, heightTextField, wallDensitySlider);
+        constraints.gridwidth = GENERATE_BUTTON_GRID_WIDTH;
         addComponents(constraints, generateMazeButton);
     }
 

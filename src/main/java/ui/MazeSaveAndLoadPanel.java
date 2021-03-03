@@ -1,6 +1,5 @@
 package ui;
 
-import models.MazeHolder;
 import ui.buttons.LoadMazeButton;
 import ui.buttons.SaveMazeButton;
 
@@ -9,12 +8,12 @@ import java.awt.*;
 
 public class MazeSaveAndLoadPanel extends JPanel {
 
-    public MazeSaveAndLoadPanel(MazeHolder mazeHolder) {
+    public MazeSaveAndLoadPanel() {
         setLayout(new GridBagLayout());
 
         final var constraints = initializeConstraints();
-        add(new SaveMazeButton(mazeHolder), constraints);
-        add(new LoadMazeButton(mazeHolder), constraints);
+        add(new SaveMazeButton(), constraints);
+        add(new LoadMazeButton(), constraints);
     }
 
     private GridBagConstraints initializeConstraints() {

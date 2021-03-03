@@ -13,13 +13,14 @@ import java.awt.*;
 import java.util.List;
 
 public class MazeView extends JComponent {
-    private final MazeHolder mazeHolder;
     private TerrainCell.Type outsideCellType = TerrainCell.Type.first();
 
-    public MazeView(MazeHolder mazeHolder) {
-        this.mazeHolder = mazeHolder;
+    public MazeView() {
+        subscribeToMazeHolder();
+    }
 
-        mazeHolder.addListener(maze -> {
+    private void subscribeToMazeHolder() {
+        MazeHolder.getInstance().addListener(maze -> {
             subscribeToNewMaze(maze);
             repaint();
         });
@@ -53,7 +54,7 @@ public class MazeView extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         if (maze == null) return;
 
         final var cellDimension = getCellDimension();
@@ -82,7 +83,7 @@ public class MazeView extends JComponent {
     }
 
     private void paintMaze(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
 
         for (var y = cellStartY; y < cellEndY; y++) {
             for (var x = cellStartX; x < cellEndX; x++) {
@@ -104,7 +105,7 @@ public class MazeView extends JComponent {
     }
 
     private void paintWaypoints(Graphics g, int cellDimension, int remainderWidth, int remainderHeight, int cellStartX, int cellStartY, int cellEndX, int cellEndY) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         final var waypoints = new Cell[]{maze.getStart(), maze.getFinish()};
 
         for (var waypoint : waypoints) {
@@ -122,7 +123,7 @@ public class MazeView extends JComponent {
     }
 
     private int getCellDimension() {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         return Math.min(getWidth() / maze.getWidth(), getHeight() / maze.getHeight());
     }
 

@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 public class BrushTool implements Tool {
     private static final Random RANDOM = new Random();
 
-    private final MazeHolder mazeHolder;
     private final Supplier<Integer> radiusSupplier;
     private final Supplier<Double> densitySupplier;
     private final Supplier<TerrainCell.Type> typeSupplier;
@@ -24,13 +23,11 @@ public class BrushTool implements Tool {
     private Set<TerrainCell> modifiedCells;
 
     public BrushTool(
-            MazeHolder mazeHolder,
             Supplier<Integer> radiusSupplier,
             Supplier<Double> densitySupplier,
             Supplier<TerrainCell.Type> typeSupplier,
             Supplier<Set<TerrainCell.Type>> indestructibleTypesSupplier
     ) {
-        this.mazeHolder = mazeHolder;
         this.radiusSupplier = radiusSupplier;
         this.densitySupplier = densitySupplier;
         this.typeSupplier = typeSupplier;
@@ -64,11 +61,11 @@ public class BrushTool implements Tool {
 
     private void publishEdit() {
         if (modifiedCells.isEmpty()) return;
-        EditManager.getInstance().push(new BrushStrokeEdit(mazeHolder, typeSupplier.get(), modifiedCells));
+        EditManager.getInstance().push(new BrushStrokeEdit(modifiedCells, typeSupplier.get()));
     }
 
     private void paintMazeUsingCurrentBrushSettings(int centerX, int centerY, TerrainCell.Type brushType) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         final var brushRadius = radiusSupplier.get();
         final var brushDensity = densitySupplier.get();
         final var indestructibleCellTypes = indestructibleTypesSupplier.get();

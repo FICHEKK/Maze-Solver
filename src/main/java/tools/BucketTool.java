@@ -14,13 +14,10 @@ import java.util.Set;
 import java.util.function.*;
 
 public class BucketTool implements Tool {
-    private final MazeHolder mazeHolder;
     private final Supplier<TerrainCell.Type> fillTypeSupplier;
-
     private Set<TerrainCell> modifiedCells;
 
-    public BucketTool(MazeHolder mazeHolder, Supplier<TerrainCell.Type> fillTypeSupplier) {
-        this.mazeHolder = mazeHolder;
+    public BucketTool(Supplier<TerrainCell.Type> fillTypeSupplier) {
         this.fillTypeSupplier = fillTypeSupplier;
     }
 
@@ -35,11 +32,11 @@ public class BucketTool implements Tool {
 
     private void publishEdit() {
         if (modifiedCells.isEmpty()) return;
-        EditManager.getInstance().push(new BrushStrokeEdit(mazeHolder, fillTypeSupplier.get(), modifiedCells));
+        EditManager.getInstance().push(new BrushStrokeEdit(modifiedCells, fillTypeSupplier.get()));
     }
 
     private void fill(int cellX, int cellY, TerrainCell.Type fillType) {
-        final var maze = mazeHolder.getMaze();
+        final var maze = MazeHolder.getInstance().getMaze();
         if (maze == null) return;
         if (cellX < 0 || cellX >= maze.getWidth() || cellY < 0 || cellY >= maze.getHeight()) return;
 

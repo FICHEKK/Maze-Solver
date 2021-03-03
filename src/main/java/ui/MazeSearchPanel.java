@@ -23,7 +23,6 @@ public class MazeSearchPanel extends JPanel {
     private static final Color CLEAR_BUTTON_BACKGROUND_COLOR = Color.WHITE;
     private static final String SEARCH_RESULT_LABEL_TEXT = "Cost: - | Visited: -";
 
-    private final MazeHolder mazeHolder;
     private final JComboBox<SearchAlgorithm<TerrainCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton searchButton = new JButton();
     private final JButton clearButton = new JButton();
@@ -31,9 +30,8 @@ public class MazeSearchPanel extends JPanel {
 
     private MazeSearchAnimationWorker animationWorker;
 
-    public MazeSearchPanel(MazeHolder mazeHolder) {
-        this.mazeHolder = mazeHolder;
-        this.mazeHolder.addListener(maze -> handleMazeChange());
+    public MazeSearchPanel() {
+        MazeHolder.getInstance().addListener(maze -> handleMazeChange());
 
         setLayout(new GridBagLayout());
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
@@ -63,9 +61,9 @@ public class MazeSearchPanel extends JPanel {
     }
 
     private void addSearchAlgorithmPicker(GridBagConstraints constraints) {
-        searchAlgorithmPicker.addItem(new AStar<>(cell -> mazeHolder.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new AStar<>(cell -> MazeHolder.getInstance().getMaze().getDiagonalManhattanDistanceToFinish(cell)));
         searchAlgorithmPicker.addItem(new Dijkstra<>());
-        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> mazeHolder.getMaze().getDiagonalManhattanDistanceToFinish(cell)));
+        searchAlgorithmPicker.addItem(new GreedyBestFirstSearch<>(cell -> MazeHolder.getInstance().getMaze().getDiagonalManhattanDistanceToFinish(cell)));
         searchAlgorithmPicker.addItem(new BreadthFirstSearch<>());
         searchAlgorithmPicker.addItem(new DepthFirstSearch<>());
 
@@ -106,7 +104,7 @@ public class MazeSearchPanel extends JPanel {
     }
 
     private void startAnimationWorker() {
-        var maze = mazeHolder.getMaze();
+        var maze = MazeHolder.getInstance().getMaze();
         var searchResult = searchMaze(maze);
 
         (animationWorker = new MazeSearchAnimationWorker(maze, searchResult)).addPropertyChangeListener(event -> {
@@ -144,7 +142,7 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mazeHolder.getMaze().clearSearchLayer();
+                MazeHolder.getInstance().getMaze().clearSearchLayer();
                 searchResultLabel.setText(SEARCH_RESULT_LABEL_TEXT);
                 clearButton.setEnabled(false);
             }

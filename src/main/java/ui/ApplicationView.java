@@ -1,7 +1,5 @@
 package ui;
 
-import models.MazeHolder;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -14,9 +12,6 @@ public class ApplicationView extends JFrame {
     private static final int WINDOW_HEIGHT = 960;
     private static final int PADDING = 20;
 
-    private final MazeHolder mazeHolder = new MazeHolder();
-    private final MazeView mazeView = new MazeView(mazeHolder);
-
     public ApplicationView() {
         setTitle(WINDOW_TITLE);
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -27,11 +22,12 @@ public class ApplicationView extends JFrame {
     }
 
     private void initGUI() {
+        final var mazeView = new MazeView();
         add(mazeView, BorderLayout.CENTER);
-        add(createControlPanel(), BorderLayout.EAST);
+        add(createControlPanel(mazeView), BorderLayout.EAST);
     }
 
-    private JPanel createControlPanel() {
+    private JPanel createControlPanel(MazeView mazeView) {
         var controlPanel = new JPanel(new GridBagLayout());
         controlPanel.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
@@ -40,13 +36,13 @@ public class ApplicationView extends JFrame {
         constraints.weighty = 1.0;
         constraints.gridx = 0;
 
-        controlPanel.add(wrapPanelInBorder(new MazeGenerationPanel(mazeHolder), "Generate "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeGenerationPanel(), "Generate "), constraints);
         controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
-        controlPanel.add(wrapPanelInBorder(new MazeEditingPanel(mazeView, mazeHolder), "Edit "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeEditingPanel(mazeView), "Edit "), constraints);
         controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
-        controlPanel.add(wrapPanelInBorder(new MazeSearchPanel(mazeHolder), "Search "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeSearchPanel(), "Search "), constraints);
         controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
-        controlPanel.add(wrapPanelInBorder(new MazeSaveAndLoadPanel(mazeHolder), "Save / Load "), constraints);
+        controlPanel.add(wrapPanelInBorder(new MazeSaveAndLoadPanel(), "Save / Load "), constraints);
 
         return controlPanel;
     }

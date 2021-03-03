@@ -9,6 +9,7 @@ import util.MazeConverter;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 
 public class LoadMazeButton extends ConvertMazeButton {
@@ -17,10 +18,7 @@ public class LoadMazeButton extends ConvertMazeButton {
 
     private static final String LOAD_ACTION_TEXT = "Load";
 
-    private final MazeHolder mazeHolder;
-
-    public LoadMazeButton(MazeHolder mazeHolder) {
-        this.mazeHolder = mazeHolder;
+    public LoadMazeButton() {
         setClickAction();
         setGUI();
     }
@@ -37,10 +35,7 @@ public class LoadMazeButton extends ConvertMazeButton {
                 var source = fileChooser.getSelectedFile();
 
                 try {
-                    final var oldMaze = mazeHolder.getMaze();
-                    final var newMaze = MazeConverter.deserialize(source);
-                    publishEdit(oldMaze, newMaze);
-                    mazeHolder.setMaze(newMaze);
+                    loadMaze(source);
                     showMessage("Success", "Maze was successfully loaded from " + source.getAbsolutePath() + ".", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException exception) {
                     showMessage("Error", "Maze could not be loaded from " + source.getAbsolutePath() + ".", JOptionPane.ERROR_MESSAGE);
@@ -49,9 +44,16 @@ public class LoadMazeButton extends ConvertMazeButton {
         });
     }
 
+    private void loadMaze(File source) throws IOException {
+        final var oldMaze = MazeHolder.getInstance().getMaze();
+        final var newMaze = MazeConverter.deserialize(source);
+        MazeHolder.getInstance().setMaze(newMaze);
+        publishEdit(oldMaze, newMaze);
+    }
+
     private void publishEdit(Maze oldMaze, Maze newMaze) {
         if (oldMaze == null) return;
-        EditManager.getInstance().push(new MazeGenerationEdit(mazeHolder, oldMaze, newMaze));
+        EditManager.getInstance().push(new MazeGenerationEdit(oldMaze, newMaze));
     }
 
     private void setGUI() {

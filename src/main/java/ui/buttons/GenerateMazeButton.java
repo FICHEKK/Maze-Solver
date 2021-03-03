@@ -20,20 +20,17 @@ public class GenerateMazeButton extends JButton {
     private static final int MIN_DIMENSION = 4;
     private static final int MAX_DIMENSION = 1000;
 
-    private final MazeHolder mazeHolder;
     private final JComboBox<MazeGenerator> mazeGeneratorPicker;
     private final JTextField widthTextField;
     private final JTextField heightTextField;
     private final JSlider wallDensitySlider;
 
     public GenerateMazeButton(
-            MazeHolder mazeHolder,
             JComboBox<MazeGenerator> mazeGeneratorPicker,
             JTextField widthTextField,
             JTextField heightTextField,
             JSlider wallDensitySlider
     ) {
-        this.mazeHolder = mazeHolder;
         this.mazeGeneratorPicker = mazeGeneratorPicker;
         this.widthTextField = widthTextField;
         this.heightTextField = heightTextField;
@@ -70,23 +67,29 @@ public class GenerateMazeButton extends JButton {
             if (height < MIN_DIMENSION || height > MAX_DIMENSION)
                 throw new NumberFormatException("Height must be in range [" + MIN_DIMENSION + ", " + MAX_DIMENSION + "].");
 
-            var maze = getSelectedMazeGenerator().generate(width, height);
-
-            var replacer = new MazeReplacer();
-            var wallDensity = (double) wallDensitySlider.getValue() / wallDensitySlider.getMaximum();
-            replacer.addTypeReplacements(TerrainCell.Type.BUSH, List.of(new MazeReplacer.Replacement(TerrainCell.Type.DIRT, 1 - wallDensity)));
-            replacer.transform(maze);
-
-            publishEdit(mazeHolder.getMaze(), maze);
-            mazeHolder.setMaze(maze);
+            final var oldMaze = MazeHolder.getInstance().getMaze();
+            final var newMaze = generateNewMaze(width, height);
+            MazeHolder.getInstance().setMaze(newMaze);
+            publishEdit(oldMaze, newMaze);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage());
         }
     }
 
+    private Maze generateNewMaze(int width, int height) {
+        final var maze = getSelectedMazeGenerator().generate(width, height);
+
+        final var replacer = new MazeReplacer();
+        final var wallDensity = (double) wallDensitySlider.getValue() / wallDensitySlider.getMaximum();
+        replacer.addTypeReplacements(TerrainCell.Type.BUSH, List.of(new MazeReplacer.Replacement(TerrainCell.Type.DIRT, 1 - wallDensity)));
+        replacer.transform(maze);
+
+        return maze;
+    }
+
     private void publishEdit(Maze oldMaze, Maze newMaze) {
         if (oldMaze == null) return;
-        EditManager.getInstance().push(new MazeGenerationEdit(mazeHolder, oldMaze, newMaze));
+        EditManager.getInstance().push(new MazeGenerationEdit(oldMaze, newMaze));
     }
 
     private int tryParseInt(String string) {
