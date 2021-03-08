@@ -2,6 +2,7 @@ package ui;
 
 import generators.*;
 import ui.buttons.GenerateMazeButton;
+import util.ImageUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,6 +19,7 @@ public class MazeGenerationPanel extends JPanel {
     private static final int MAX_WALL_DENSITY = 100;
 
     private static final int GENERATE_BUTTON_GRID_WIDTH = 2;
+    private static final String GENERATE_BUTTON_ICON_PATH = "/icons/generate.png";
 
     private static final Dimension WALL_DENSITY_SLIDER_DIMENSION = new Dimension(80, 20);
     private static final Dimension WALL_DENSITY_LABEL_DIMENSION = new Dimension(120, 20);
@@ -82,6 +84,7 @@ public class MazeGenerationPanel extends JPanel {
 
     private void addGenerateMazeButton(GridBagConstraints constraints) {
         final var generateMazeButton = new GenerateMazeButton(mazeGeneratorPicker, widthTextField, heightTextField, wallDensitySlider);
+        generateMazeButton.setIcon(ImageUtils.loadIcon(GENERATE_BUTTON_ICON_PATH));
         constraints.gridwidth = GENERATE_BUTTON_GRID_WIDTH;
         addComponents(constraints, generateMazeButton);
     }

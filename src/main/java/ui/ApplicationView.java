@@ -1,5 +1,7 @@
 package ui;
 
+import util.ImageUtils;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -7,7 +9,9 @@ import java.awt.*;
 
 public class ApplicationView extends JFrame {
     private static final String WANTED_LOOK_AND_FEEL = "Nimbus";
+    private static final String WINDOW_ICON_PATH = "/icons/maze.png";
     private static final String WINDOW_TITLE = "Maze Solver";
+
     private static final int WINDOW_WIDTH = 1440;
     private static final int WINDOW_HEIGHT = 960;
     private static final int PADDING = 20;
@@ -25,6 +29,9 @@ public class ApplicationView extends JFrame {
         final var mazeView = new MazeView();
         add(mazeView, BorderLayout.CENTER);
         add(createControlPanel(mazeView), BorderLayout.EAST);
+
+        //noinspection ConstantConditions
+        setIconImage(ImageUtils.loadIcon(WINDOW_ICON_PATH).getImage());
     }
 
     private JPanel createControlPanel(MazeView mazeView) {

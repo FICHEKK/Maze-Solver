@@ -4,6 +4,7 @@ import edits.EditManager;
 import edits.MazeGenerationEdit;
 import models.Maze;
 import models.MazeHolder;
+import util.ImageUtils;
 import util.MazeConverter;
 
 import javax.swing.*;
@@ -15,8 +16,8 @@ import java.io.IOException;
 public class LoadMazeButton extends ConvertMazeButton {
     private static final Color TEXT_COLOR = Color.WHITE;
     private static final Color BACKGROUND_COLOR = new Color(146, 146, 146, 255);
-
     private static final String LOAD_ACTION_TEXT = "Load";
+    private static final String ICON_PATH = "/icons/load.png";
 
     public LoadMazeButton() {
         setClickAction();
@@ -60,5 +61,6 @@ public class LoadMazeButton extends ConvertMazeButton {
         setText(LOAD_ACTION_TEXT);
         setForeground(TEXT_COLOR);
         setBackground(BACKGROUND_COLOR);
+        setIcon(ImageUtils.loadIcon(ICON_PATH));
     }
 }

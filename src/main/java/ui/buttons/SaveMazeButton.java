@@ -1,6 +1,7 @@
 package ui.buttons;
 
 import models.MazeHolder;
+import util.ImageUtils;
 import util.MazeConverter;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ public class SaveMazeButton extends ConvertMazeButton {
     private static final Color TEXT_COLOR = Color.WHITE;
     private static final Color BACKGROUND_COLOR = new Color(0, 146, 255, 255);
     private static final String SAVE_ACTION_TEXT = "Save";
+    private static final String ICON_PATH = "/icons/save.png";
 
     public SaveMazeButton() {
         setClickAction();
@@ -48,5 +50,6 @@ public class SaveMazeButton extends ConvertMazeButton {
         setText(SAVE_ACTION_TEXT);
         setForeground(TEXT_COLOR);
         setBackground(BACKGROUND_COLOR);
+        setIcon(ImageUtils.loadIcon(ICON_PATH));
     }
 }

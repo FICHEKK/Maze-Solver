@@ -2,12 +2,14 @@ package ui.buttons;
 
 import edits.EditManager;
 import edits.EditManagerListener;
+import util.ImageUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 public class RedoButton extends JButton {
     private static final String TITLE = "Redo";
+    private static final String ICON_PATH = "/icons/redo.png";
 
     public RedoButton() {
         setClickAction();
@@ -18,6 +20,7 @@ public class RedoButton extends JButton {
     private void setGUI() {
         setText(TITLE);
         setEnabled(false);
+        setIcon(ImageUtils.loadIcon(ICON_PATH));
     }
 
     private void setClickAction() {
