@@ -31,7 +31,6 @@ public class TerrainCellSelectionEditor extends BasicComboBoxEditor {
     }
 
     private static class TerrainTypePalette extends JComponent {
-        private static final int CELL_DIMENSION = 20;
         private static final int CELL_GAP = 5;
         private static final String EMPTY_PALETTE_TEXT = "No cells are indestructible.";
 
@@ -61,17 +60,24 @@ public class TerrainCellSelectionEditor extends BasicComboBoxEditor {
         }
 
         private void paintPalette(Graphics g, int cellCount) {
-            final var paletteWidth = CELL_DIMENSION * cellCount + CELL_GAP * (cellCount - 1);
+            final var cellDimension = getCellDimension();
+            final var paletteWidth = cellDimension * cellCount + CELL_GAP * (cellCount - 1);
 
             var x = (getWidth() - paletteWidth) / 2;
-            final var y = (getHeight() - CELL_DIMENSION) / 2;
+            final var y = (getHeight() - cellDimension) / 2;
 
             for (var type : model.getSelectedItems()) {
                 g.setColor(type.getColor());
-                g.fillRect(x, y, CELL_DIMENSION, CELL_DIMENSION);
+                g.fillRect(x, y, cellDimension, cellDimension);
 
-                x += CELL_DIMENSION + CELL_GAP;
+                x += cellDimension + CELL_GAP;
             }
+        }
+
+        private int getCellDimension() {
+            final var typeCount = TerrainCell.Type.values().length;
+            final var drawableAreaWidth = getWidth() - (typeCount + 1) * CELL_GAP;
+            return drawableAreaWidth / typeCount;
         }
     }
 }

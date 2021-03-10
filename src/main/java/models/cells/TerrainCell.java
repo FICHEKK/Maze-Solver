@@ -1,6 +1,8 @@
 package models.cells;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class TerrainCell extends Cell {
     private Type type;
@@ -28,22 +30,49 @@ public final class TerrainCell extends Cell {
     }
 
     public enum Type {
-        DIRT(1, new Color(162, 97, 12, 255)),
-        SAND(2, new Color(255, 192, 0, 255)),
-        WATER(5, new Color(0, 146, 255, 255)),
-        BUSH(Double.POSITIVE_INFINITY, new Color(5, 91, 0, 255)),
-        STONE(Double.POSITIVE_INFINITY, new Color(146, 146, 146, 255));
+        DIRT((byte) 'D', 1, new Color(162, 97, 12)),
+        GRASS((byte) 'G', 1, new Color(0, 172, 0)),
+        SAND((byte) 'S', 2, new Color(255, 192, 0)),
+        SNOW((byte) 's', 3, new Color(255, 255, 255)),
+        ICE((byte) 'I', 4, new Color(180, 207, 250)),
+        WATER((byte) 'W', 5, new Color(0, 146, 255)),
+        BUSH((byte) 'B', Double.POSITIVE_INFINITY, new Color(5, 91, 0)),
+        ROCK((byte) 'R', Double.POSITIVE_INFINITY, new Color(146, 146, 146)),
+        LAVA((byte) 'L', Double.POSITIVE_INFINITY, new Color(127, 0, 0));
 
-        private final double weight;
-        private final Color color;
+        private static final Map<Byte, Type> ID_TO_TYPE = new HashMap<>();
 
-        Type(double weight, Color color) {
-            this.weight = weight;
-            this.color = color;
+        static {
+            for (var type : values()) {
+                if (ID_TO_TYPE.containsKey(type.getId())) {
+                    final var takenIdType = ID_TO_TYPE.get(type.getId());
+                    throw new AssertionError(takenIdType.name() + " and " + type.name() + " have the same identifier.");
+                }
+
+                ID_TO_TYPE.put(type.getId(), type);
+            }
+        }
+
+        public static Type fromId(byte id) {
+            return ID_TO_TYPE.get(id);
         }
 
         public static Type first() {
             return values()[0];
+        }
+
+        private final byte id;
+        private final double weight;
+        private final Color color;
+
+        Type(byte id, double weight, Color color) {
+            this.id = id;
+            this.weight = weight;
+            this.color = color;
+        }
+
+        public byte getId() {
+            return id;
         }
 
         public double getWeight() {
