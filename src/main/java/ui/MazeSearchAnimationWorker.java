@@ -12,20 +12,21 @@ import java.util.List;
 
 public class MazeSearchAnimationWorker extends SwingWorker<Void, Void> {
     private static final int NO_DELAY = 0;
-    private static final int STEP_DELAY = 10;
 
     private final Maze maze;
     private final SearchResult<TerrainCell> searchResult;
+    private final int stepDelay;
 
-    public MazeSearchAnimationWorker(Maze maze, SearchResult<TerrainCell> searchResult) {
+    public MazeSearchAnimationWorker(Maze maze, SearchResult<TerrainCell> searchResult, int stepDelay) {
         this.maze = maze;
         this.searchResult = searchResult;
+        this.stepDelay = stepDelay;
     }
 
     @Override
     protected Void doInBackground() throws InterruptedException {
         maze.clearSearchLayer();
-        displaySearchResult(STEP_DELAY);
+        displaySearchResult(stepDelay);
         return null;
     }
 

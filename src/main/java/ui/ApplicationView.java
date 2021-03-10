@@ -1,5 +1,6 @@
 package ui;
 
+import ui.buttons.ExitButton;
 import util.ImageUtils;
 
 import javax.swing.*;
@@ -21,7 +22,10 @@ public class ApplicationView extends JFrame {
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setVisible(true);
+
         initGUI();
     }
 
@@ -50,6 +54,8 @@ public class ApplicationView extends JFrame {
         controlPanel.add(wrapPanelInBorder(new MazeSearchPanel(), "Search "), constraints);
         controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
         controlPanel.add(wrapPanelInBorder(new MazeSaveAndLoadPanel(), "Save / Load "), constraints);
+        controlPanel.add(new JSeparator(JSeparator.HORIZONTAL), constraints);
+        controlPanel.add(new ExitButton(this), constraints);
 
         return controlPanel;
     }

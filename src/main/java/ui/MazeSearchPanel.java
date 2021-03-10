@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.function.*;
 
 public class MazeSearchPanel extends JPanel {
+    private static final int MIN_STEP_DURATION = 0;
+    private static final int DEFAULT_STEP_DURATION = 10;
+    private static final int MAX_STEP_DURATION = 10000;
+
     private static final int PADDING = 10;
     private static final String SEARCH_BUTTON_START_TEXT = "Search";
     private static final String SEARCH_BUTTON_STOP_TEXT = "Stop";
@@ -29,6 +33,7 @@ public class MazeSearchPanel extends JPanel {
     private final JComboBox<SearchAlgorithm<TerrainCell>> searchAlgorithmPicker = new JComboBox<>();
     private final JButton searchButton = new JButton();
     private final JButton clearButton = new JButton();
+    private final JTextField stepDurationField = new JTextField(String.valueOf(DEFAULT_STEP_DURATION));
     private final JLabel searchResultLabel = new JLabel();
 
     private MazeSearchAnimationWorker animationWorker;
@@ -40,7 +45,8 @@ public class MazeSearchPanel extends JPanel {
         setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
 
         var constraints = new GridBagConstraints();
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridwidth = 2;
+        constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.0;
         constraints.weighty = 1.0;
         constraints.ipady = 5;
@@ -51,6 +57,7 @@ public class MazeSearchPanel extends JPanel {
         addSearchAlgorithmPicker(constraints);
         addSearchButton(constraints);
         addClearButton(constraints);
+        addStepDurationField(constraints);
         addSearchResultLabel(constraints);
     }
 
@@ -108,17 +115,40 @@ public class MazeSearchPanel extends JPanel {
     }
 
     private void startAnimationWorker() {
-        var maze = MazeHolder.getInstance().getMaze();
-        var searchResult = searchMaze(maze);
+        try {
+            final var stepDuration = getStepDuration();
+            final var maze = MazeHolder.getInstance().getMaze();
+            final var searchResult = searchMaze(maze);
 
-        (animationWorker = new MazeSearchAnimationWorker(maze, searchResult)).addPropertyChangeListener(event -> {
-            searchButton.setText(animationWorker.isDone() ? SEARCH_BUTTON_START_TEXT : SEARCH_BUTTON_STOP_TEXT);
-            searchButton.setBackground(animationWorker.isDone() ? SEARCH_BUTTON_START_COLOR : SEARCH_BUTTON_STOP_COLOR);
-            clearButton.setEnabled(animationWorker.isDone());
-            searchResultLabel.setText(animationWorker.isDone() ? searchResult.toString() : SEARCH_RESULT_LABEL_TEXT);
-        });
+            this.animationWorker = new MazeSearchAnimationWorker(maze, searchResult, stepDuration);
 
-        animationWorker.execute();
+            this.animationWorker.addPropertyChangeListener(event -> {
+                searchButton.setText(animationWorker.isDone() ? SEARCH_BUTTON_START_TEXT : SEARCH_BUTTON_STOP_TEXT);
+                searchButton.setBackground(animationWorker.isDone() ? SEARCH_BUTTON_START_COLOR : SEARCH_BUTTON_STOP_COLOR);
+                clearButton.setEnabled(animationWorker.isDone());
+                searchResultLabel.setText(animationWorker.isDone() ? searchResult.toString() : SEARCH_RESULT_LABEL_TEXT);
+            });
+
+            animationWorker.execute();
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(null, exception.getMessage());
+        }
+    }
+
+    private int getStepDuration() {
+        final var stepDurationText = stepDurationField.getText();
+        final int stepDuration;
+
+        try {
+            stepDuration = Integer.parseInt(stepDurationText);
+        } catch (NumberFormatException ex) {
+            throw new NumberFormatException("'" + stepDurationText + "' is not a valid step duration value.");
+        }
+
+        if (stepDuration < MIN_STEP_DURATION || stepDuration > MAX_STEP_DURATION)
+            throw new NumberFormatException("Step duration must be in range [" + MIN_STEP_DURATION + ", " + MAX_STEP_DURATION + "].");
+
+        return stepDuration;
     }
 
     private SearchResult<TerrainCell> searchMaze(Maze maze) {
@@ -157,6 +187,20 @@ public class MazeSearchPanel extends JPanel {
         clearButton.setEnabled(false);
         clearButton.setIcon(ImageUtils.loadIcon(CLEAR_ICON_PATH));
         add(clearButton, constraints);
+    }
+
+    private void addStepDurationField(GridBagConstraints constraints) {
+        constraints.gridwidth = 1;
+
+        constraints.gridx = 0;
+        add(new JLabel("Step duration (ms):", JLabel.CENTER), constraints);
+
+        constraints.gridx = 1;
+        stepDurationField.setHorizontalAlignment(SwingConstants.CENTER);
+        add(stepDurationField, constraints);
+
+        constraints.gridwidth = 2;
+        constraints.gridx = 0;
     }
 
     private void addSearchResultLabel(GridBagConstraints constraints) {
