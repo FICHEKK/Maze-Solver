@@ -79,19 +79,19 @@ Mazes can be saved to and loaded from files.
 
 # 🗺️ Examples
 
-## 🌵 *enclosed-desert.maze*
+## 🌵 *enclosed-desert.maze* (Dijkstra's algorithm)
 ![](doc/gifs/enclosed-desert.gif)
 
-## 🏝️ *tropical-islands.maze*
+## 🏝️ *tropical-islands.maze* (Dijkstra's algorithm)
 ![](doc/gifs/tropical-islands.gif)
 
-## 🌋 *cracked-volcano.maze*
+## 🌋 *cracked-volcano.maze* (A* search algorithm)
 ![](doc/gifs/cracked-volcano.gif)
 
-## ❄️ *frozen-lakes.maze*
+## ❄️ *frozen-lakes.maze* (Dijkstra's algorithm)
 ![](doc/gifs/frozen-lakes.gif)
 
-## 🌳 *forest-walk.maze*
+## 🌳 *forest-walk.maze* (A* search algorithm)
 ![](doc/gifs/forest-walk.gif)
 
 And that is all! Have fun playing with the maze solver! 🙂
