@@ -1,4 +1,4 @@
-![](doc/header.png)
+![](doc/images/header.png)
 
 # ❓ What is it?
 Maze solver is an application which allows the user to:
@@ -13,7 +13,7 @@ Maze solver's user interface is very simple, containing only a single window of 
 * **Search** - used to search mazes.
 * **Save/Load** - used to save and load mazes to/from files.
 
-![](doc/solved-maze.png)
+![](doc/images/solved-maze.png)
 
 ## ➕ Generate
 
@@ -76,5 +76,22 @@ Mazes can be saved to and loaded from files.
 1. Click on the **Load** button - the load dialog should open.
 2. Locate and select the file which contains the maze information.
 3. Click on the **Load** button in the load dialog to load the maze from the selected file.
+
+# 🗺️ Examples
+
+## 🌵 *enclosed-desert.maze*
+![](doc/gifs/enclosed-desert.gif)
+
+## 🏝️ *tropical-islands.maze*
+![](doc/gifs/tropical-islands.gif)
+
+## 🌋 *cracked-volcano.maze*
+![](doc/gifs/cracked-volcano.gif)
+
+## ❄️ *frozen-lakes.maze*
+![](doc/gifs/frozen-lakes.gif)
+
+## 🌳 *forest-walk.maze*
+![](doc/gifs/forest-walk.gif)
 
 And that is all! Have fun playing with the maze solver! 🙂
